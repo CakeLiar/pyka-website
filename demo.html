@@ -3,7 +3,7 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Auto-Scrolling Cards Demo - Retro Style</title>
+        <title>Auto-Scrolling Tweet Cards - Retro Style</title>
         <style>
             * {
                 margin: 0;
@@ -19,6 +19,7 @@
                 -moz-osx-font-smoothing: grayscale;
                 display: flex;
                 flex-direction: column;
+                overflow: hidden;
             }
 
             .header {
@@ -65,6 +66,10 @@
                 gap: 0;
                 padding: 0;
                 margin: 0;
+                height: 100%;
+                width: 100%;
+                overflow: hidden;
+                position: relative;
             }
 
             .scrolling-container {
@@ -112,71 +117,155 @@
                 background: transparent;
             }
 
-            .card {
+            .tweet-card {
                 margin: 0.5rem;
                 padding: 1rem;
-                background: #f4f1e8;
-                border-radius: 3px;
-                box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-                border: 1px solid #d4c5a9;
-                transition: none;
-                position: relative;
-                overflow: hidden;
+                background: #d4c5a9;
+                border-radius: 2px;
+                border: 2px solid #8b4513;
+                box-shadow: 3px 3px 0px #654321;
                 font-family: "Courier New", monospace;
-            }
-
-            .fast-container .card {
-                border-color: #8b4513;
-                background: #f0e6d2;
-            }
-
-            .slow-container .card {
-                border-color: #654321;
-                background: #ede0c8;
-            }
-
-            .card:hover {
-                transform: none;
-                box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-            }
-
-            .card::before {
-                content: "";
-                position: absolute;
-                top: 0;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                background: none;
-                transform: none;
+                position: relative;
                 transition: none;
             }
 
-            .card:hover::before {
-                transform: none;
+            .fast-container .tweet-card {
+                background: #e8dcc0;
+                border-color: #b8860b;
+                box-shadow: 3px 3px 0px #8b6914;
             }
 
-            .card-title {
-                color: #2c1810;
+            .slow-container .tweet-card {
+                background: #f0e6d2;
+                border-color: #cd853f;
+                box-shadow: 3px 3px 0px #a0522d;
+            }
+
+            .tweet-card:hover {
+                transform: translate(-1px, -1px);
+                box-shadow: 4px 4px 0px #654321;
+            }
+
+            .fast-container .tweet-card:hover {
+                box-shadow: 4px 4px 0px #8b6914;
+            }
+
+            .slow-container .tweet-card:hover {
+                box-shadow: 4px 4px 0px #a0522d;
+            }
+
+            .tweet-header {
+                display: flex;
+                align-items: flex-start;
+                margin-bottom: 0.5rem;
+                gap: 0.5rem;
+            }
+
+            .tweet-avatar {
+                width: 30px;
+                height: 30px;
+                background: #8b4513;
+                color: #f4f1e8;
+                border-radius: 2px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
                 font-size: 1rem;
                 font-weight: bold;
-                margin-bottom: 0.5rem;
-                text-align: left;
-                position: relative;
-                z-index: 1;
-                font-family: "Courier New", monospace;
-                text-transform: uppercase;
-                letter-spacing: 1px;
+                border: 1px solid #654321;
+                flex-shrink: 0;
             }
 
-            .card-content {
-                color: #3c2415;
+            .tweet-user-info {
+                flex: 1;
+                min-width: 0;
+            }
+
+            .tweet-username {
+                color: #2c1810;
                 font-size: 0.9rem;
+                font-weight: bold;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                margin-bottom: 0.1rem;
+            }
+
+            .tweet-handle {
+                color: #5c4a3a;
+                font-size: 0.75rem;
+                text-transform: lowercase;
+                letter-spacing: 0.5px;
+            }
+
+            .tweet-content {
+                color: #2c1810;
+                font-size: 0.85rem;
                 line-height: 1.4;
+                margin-bottom: 0.75rem;
+                word-wrap: break-word;
+            }
+
+            .tweet-actions {
+                display: flex;
+                justify-content: space-between;
+                border-top: 1px solid #8b4513;
+                padding-top: 0.5rem;
+                margin-top: 0.5rem;
+            }
+
+            .tweet-action {
+                display: flex;
+                align-items: center;
+                gap: 0.25rem;
+                color: #5c4a3a;
+                font-size: 0.7rem;
+                cursor: pointer;
+                padding: 0.2rem 0.4rem;
+                border-radius: 2px;
+                transition: background-color 0.1s;
+            }
+
+            .tweet-action:hover {
+                background-color: rgba(139, 69, 19, 0.1);
+            }
+
+            .action-icon {
+                font-size: 0.8rem;
+                font-weight: bold;
+            }
+
+            .action-count {
+                font-weight: normal;
+                min-width: 1.5rem;
                 text-align: left;
-                position: relative;
-                z-index: 1;
-                font-family: "Courier New", monospace;
+            }
+
+            /* Fast container specific styling */
+            .fast-container .tweet-avatar {
+                background: #b8860b;
+                border-color: #8b6914;
+            }
+
+            .fast-container .tweet-actions {
+                border-top-color: #b8860b;
+            }
+
+            .fast-container .tweet-action:hover {
+                background-color: rgba(184, 134, 11, 0.1);
+            }
+
+            /* Slow container specific styling */
+            .slow-container .tweet-avatar {
+                background: #cd853f;
+                border-color: #a0522d;
+            }
+
+            .slow-container .tweet-actions {
+                border-top-color: #cd853f;
+            }
+
+            .slow-container .tweet-action:hover {
+                background-color: rgba(205, 133, 63, 0.1);
             }
 
             @media (max-width: 768px) {
@@ -196,17 +285,35 @@
                     height: 100%;
                 }
 
-                .card {
+                .tweet-card {
                     margin: 0.3rem;
                     padding: 0.8rem;
                 }
 
-                .card-title {
+                .tweet-avatar {
+                    width: 25px;
+                    height: 25px;
                     font-size: 0.9rem;
                 }
 
-                .card-content {
+                .tweet-username {
                     font-size: 0.8rem;
+                }
+
+                .tweet-handle {
+                    font-size: 0.7rem;
+                }
+
+                .tweet-content {
+                    font-size: 0.8rem;
+                }
+
+                .action-icon {
+                    font-size: 0.7rem;
+                }
+
+                .action-count {
+                    font-size: 0.65rem;
                 }
 
                 .header {
@@ -231,12 +338,39 @@
                     height: 100%;
                 }
 
-                .card-title {
+                .tweet-card {
+                    margin: 0.2rem;
+                    padding: 0.6rem;
+                }
+
+                .tweet-avatar {
+                    width: 20px;
+                    height: 20px;
                     font-size: 0.8rem;
                 }
 
-                .card-content {
+                .tweet-username {
+                    font-size: 0.7rem;
+                }
+
+                .tweet-handle {
+                    font-size: 0.65rem;
+                }
+
+                .tweet-content {
                     font-size: 0.75rem;
+                }
+
+                .tweet-actions {
+                    gap: 0.5rem;
+                }
+
+                .action-icon {
+                    font-size: 0.65rem;
+                }
+
+                .action-count {
+                    font-size: 0.6rem;
                 }
 
                 .header-title {
@@ -253,186 +387,316 @@
         <div class="app">
             <header class="header">
                 <div class="header-content">
-                    <h1 class="header-title">Auto-Scrolling Cards App</h1>
-                    <p class="header-subtitle">
-                        Two containers with different scrolling speeds
-                    </p>
+                    <h1 class="header-title">Retro Tweet Stream</h1>
+                    <p class="header-subtitle">old-school social media vibes</p>
                 </div>
             </header>
 
             <div class="containers-wrapper">
                 <div class="scrolling-container fast-container">
                     <div class="cards-container" id="fast-container">
-                        <!-- Fast cards will be generated by JavaScript -->
+                        <!-- Fast tweet cards will be generated by JavaScript -->
                     </div>
                 </div>
 
                 <div class="scrolling-container slow-container">
                     <div class="cards-container" id="slow-container">
-                        <!-- Slow cards will be generated by JavaScript -->
+                        <!-- Slow tweet cards will be generated by JavaScript -->
                     </div>
                 </div>
             </div>
         </div>
 
         <script>
-            // Sample data for the cards
+            // Sample data for tweet-like cards
             const fastCards = [
                 {
                     id: 1,
-                    title: "Fast Card 1",
+                    username: "fastuser01",
+                    handle: "@fastuser01",
+                    time: "2h",
                     content:
-                        "This is a fast scrolling card with some content to display.",
+                        "Just discovered this amazing new technology stack. The performance gains are incredible! #webdev #tech",
+                    replies: 12,
+                    retweets: 8,
+                    likes: 24,
                 },
                 {
                     id: 2,
-                    title: "Fast Card 2",
+                    username: "techguru",
+                    handle: "@techguru",
+                    time: "4h",
                     content:
-                        "Another fast card with different content and information.",
+                        "Hot take: The best code is the code you don't have to write. Sometimes simplicity wins over complexity.",
+                    replies: 5,
+                    retweets: 15,
+                    likes: 42,
                 },
                 {
                     id: 3,
-                    title: "Fast Card 3",
+                    username: "devlife",
+                    handle: "@devlife",
+                    time: "6h",
                     content:
-                        "Fast scrolling card number three with unique content.",
+                        "Coffee consumption directly correlates with code quality. Scientific fact. ☕️ #developerlife",
+                    replies: 23,
+                    retweets: 67,
+                    likes: 156,
                 },
                 {
                     id: 4,
-                    title: "Fast Card 4",
+                    username: "retrocoder",
+                    handle: "@retrocoder",
+                    time: "8h",
                     content:
-                        "Fourth fast card containing interesting information.",
+                        "Remember when we used to program on green-screen terminals? Those were simpler times... #nostalgia",
+                    replies: 8,
+                    retweets: 12,
+                    likes: 35,
                 },
                 {
                     id: 5,
-                    title: "Fast Card 5",
+                    username: "pixelartist",
+                    handle: "@pixelartist",
+                    time: "10h",
                     content:
-                        "Fifth fast card with more content to scroll through.",
+                        "Spent all day working on 8-bit sprites. There's something magical about pixel-perfect art. 🎮",
+                    replies: 7,
+                    retweets: 18,
+                    likes: 89,
                 },
                 {
                     id: 6,
-                    title: "Fast Card 6",
+                    username: "oldschool",
+                    handle: "@oldschool",
+                    time: "12h",
                     content:
-                        "Sixth fast card with additional details and text.",
+                        "Why do modern websites need 50MB of JavaScript just to display text? Bring back the 90s web!",
+                    replies: 34,
+                    retweets: 92,
+                    likes: 203,
                 },
                 {
                     id: 7,
-                    title: "Fast Card 7",
+                    username: "terminalfan",
+                    handle: "@terminalfan",
+                    time: "14h",
                     content:
-                        "Seventh fast card with even more content to display.",
+                        "GUI is overrated. Real developers use command line interfaces. Change my mind. 💻 #terminal",
+                    replies: 19,
+                    retweets: 28,
+                    likes: 71,
                 },
                 {
                     id: 8,
-                    title: "Fast Card 8",
-                    content: "Eighth fast card with comprehensive information.",
+                    username: "vintagetech",
+                    handle: "@vintagetech",
+                    time: "16h",
+                    content:
+                        "Found my old CRT monitor in the basement. Still works perfectly! They don't make them like this anymore.",
+                    replies: 11,
+                    retweets: 22,
+                    likes: 58,
                 },
             ];
 
             const slowCards = [
                 {
                     id: 1,
-                    title: "Slow Card 1",
+                    username: "slowthoughts",
+                    handle: "@slowthoughts",
+                    time: "1d",
                     content:
-                        "This is a slow scrolling card with detailed content and descriptions.",
+                        "Taking time to really think about architecture decisions. Rushed code is technical debt waiting to happen.",
+                    replies: 15,
+                    retweets: 31,
+                    likes: 78,
                 },
                 {
                     id: 2,
-                    title: "Slow Card 2",
+                    username: "mindfuldev",
+                    handle: "@mindfuldev",
+                    time: "2d",
                     content:
-                        "Another slow card with extensive information and longer text content.",
+                        "Meditation before coding sessions has improved my focus tremendously. Mindfulness in software development is underrated.",
+                    replies: 9,
+                    retweets: 24,
+                    likes: 112,
                 },
                 {
                     id: 3,
-                    title: "Slow Card 3",
+                    username: "deepcoder",
+                    handle: "@deepcoder",
+                    time: "3d",
                     content:
-                        "Slow scrolling card number three with comprehensive details.",
+                        "Spent the entire day on one function. But now it's perfect, readable, and will save hours of debugging later.",
+                    replies: 18,
+                    retweets: 45,
+                    likes: 134,
                 },
                 {
                     id: 4,
-                    title: "Slow Card 4",
+                    username: "patientprog",
+                    handle: "@patientprog",
+                    time: "4d",
                     content:
-                        "Fourth slow card containing elaborate information and descriptions.",
+                        "Good software takes time. Rome wasn't built in a day, and neither should your codebase be.",
+                    replies: 22,
+                    retweets: 67,
+                    likes: 189,
                 },
                 {
                     id: 5,
-                    title: "Slow Card 5",
+                    username: "craftsman",
+                    handle: "@craftsman",
+                    time: "5d",
                     content:
-                        "Fifth slow card with thorough content and detailed explanations.",
+                        "Refactoring legacy code is like restoring a vintage car. Slow process, but the end result is beautiful.",
+                    replies: 13,
+                    retweets: 38,
+                    likes: 95,
                 },
                 {
                     id: 6,
-                    title: "Slow Card 6",
+                    username: "qualityfirst",
+                    handle: "@qualityfirst",
+                    time: "6d",
                     content:
-                        "Sixth slow card with in-depth information and extended content.",
+                        "Feature complete doesn't mean quality complete. Testing, optimization, and documentation matter too.",
+                    replies: 27,
+                    retweets: 82,
+                    likes: 156,
                 },
                 {
                     id: 7,
-                    title: "Slow Card 7",
+                    username: "philosophdev",
+                    handle: "@philosophdev",
+                    time: "7d",
                     content:
-                        "Seventh slow card with comprehensive details and descriptions.",
+                        "In programming, as in life, sometimes the best action is patient inaction. Think before you type.",
+                    replies: 8,
+                    retweets: 19,
+                    likes: 73,
                 },
                 {
                     id: 8,
-                    title: "Slow Card 8",
+                    username: "contemplator",
+                    handle: "@contemplator",
+                    time: "1w",
                     content:
-                        "Eighth slow card with complete information and thorough content.",
+                        "Every line of code is a decision. Every decision shapes the future. Choose wisely, code slowly.",
+                    replies: 16,
+                    retweets: 41,
+                    likes: 127,
                 },
             ];
 
             function createCard(card) {
                 return `
-                <div class="card">
-                    <h3 class="card-title">${card.title}</h3>
-                    <p class="card-content">${card.content}</p>
-                </div>
-            `;
+                    <div class="tweet-card">
+                        <div class="tweet-header">
+                            <div class="tweet-avatar">@</div>
+                            <div class="tweet-user-info">
+                                <div class="tweet-username">${card.username}</div>
+                                <div class="tweet-handle">${card.handle} · ${card.time}</div>
+                            </div>
+                        </div>
+                        <div class="tweet-content">${card.content}</div>
+                        <div class="tweet-actions">
+                            <div class="tweet-action">
+                                <span class="action-icon">↳</span>
+                                <span class="action-count">${card.replies}</span>
+                            </div>
+                            <div class="tweet-action">
+                                <span class="action-icon">⟲</span>
+                                <span class="action-count">${card.retweets}</span>
+                            </div>
+                            <div class="tweet-action">
+                                <span class="action-icon">♡</span>
+                                <span class="action-count">${card.likes}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
             }
 
             function populateContainer(containerId, cards) {
                 const container = document.getElementById(containerId);
-                // Add cards twice for seamless scrolling
+                if (!container) {
+                    console.error(`Container ${containerId} not found!`);
+                    return;
+                }
+
+                // Add cards multiple times for continuous scrolling
                 const cardsHTML = cards.map(createCard).join("");
-                container.innerHTML = cardsHTML + cardsHTML;
+                container.innerHTML = cardsHTML + cardsHTML + cardsHTML;
+
+                console.log(
+                    `Populated ${containerId} with ${container.children.length} cards`,
+                );
             }
 
             function createAutoScroll(containerId, speed) {
                 const container = document.getElementById(containerId);
+                if (!container) {
+                    console.error(`Container ${containerId} not found!`);
+                    return;
+                }
+
                 let scrollInterval;
+                let isScrolling = false;
 
                 function startScrolling() {
+                    if (isScrolling) return;
+                    isScrolling = true;
+
+                    console.log(`Starting scroll for ${containerId}`);
+
                     scrollInterval = setInterval(() => {
                         if (!container) return;
 
+                        // Scroll down by 1 pixel
+                        container.scrollTop += 1;
+
+                        // Reset to top when reaching the bottom
                         if (
                             container.scrollTop + container.clientHeight >=
-                            container.scrollHeight - 1
+                            container.scrollHeight - 5
                         ) {
-                            // Reset to top when reaching the bottom
-                            container.scrollTo({ top: 0, behavior: "auto" });
-                        } else {
-                            // Scroll down by 1 pixel
-                            container.scrollTo({
-                                top: container.scrollTop + 1,
-                                behavior: "auto",
-                            });
+                            container.scrollTop = 0;
+                            console.log(`Reset scroll for ${containerId}`);
                         }
-                    }, speed * 10); // Convert speed to milliseconds
+                    }, speed * 10);
                 }
 
                 function stopScrolling() {
                     if (scrollInterval) {
                         clearInterval(scrollInterval);
                         scrollInterval = null;
+                        isScrolling = false;
+                        console.log(`Stopped scroll for ${containerId}`);
                     }
                 }
 
-                // Start auto-scrolling after a small delay to ensure content is loaded
+                // Start auto-scrolling after content loads
                 setTimeout(() => {
-                    startScrolling();
-                }, 100);
+                    console.log(
+                        `Container ${containerId} height: ${container.scrollHeight}px`,
+                    );
+                    if (container.scrollHeight > container.clientHeight) {
+                        startScrolling();
+                    } else {
+                        console.warn(
+                            `Container ${containerId} not tall enough to scroll`,
+                        );
+                    }
+                }, 500);
 
                 // Pause scrolling on hover
                 container.addEventListener("mouseenter", stopScrolling);
-                container.addEventListener("mouseleave", startScrolling);
+                container.addEventListener("mouseleave", () => {
+                    setTimeout(startScrolling, 100);
+                });
 
                 // Return cleanup function
                 return stopScrolling;
@@ -440,13 +704,21 @@
 
             // Initialize the app when DOM is loaded
             document.addEventListener("DOMContentLoaded", function () {
-                // Populate containers with cards
-                populateContainer("fast-container", fastCards);
-                populateContainer("slow-container", slowCards);
+                console.log("DOM loaded, initializing scrolling demo...");
 
-                // Start auto-scrolling with different speeds
-                createAutoScroll("fast-container", 2); // Fast scrolling (20ms intervals)
-                createAutoScroll("slow-container", 5); // Slow scrolling (50ms intervals)
+                try {
+                    // Populate containers with cards
+                    populateContainer("fast-container", fastCards);
+                    populateContainer("slow-container", slowCards);
+
+                    // Start auto-scrolling with different speeds
+                    createAutoScroll("fast-container", 2); // Fast scrolling (20ms intervals)
+                    createAutoScroll("slow-container", 5); // Slow scrolling (50ms intervals)
+
+                    console.log("Scrolling demo initialized successfully");
+                } catch (error) {
+                    console.error("Error initializing scrolling demo:", error);
+                }
             });
         </script>
     </body>

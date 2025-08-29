@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Scrolling Test</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Courier New", monospace;
+            background: #2c1810;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .header {
+            background: #2c1810;
+            color: #f4f1e8;
+            padding: 0.5rem;
+            border-bottom: 2px solid #8b4513;
+            text-align: center;
+        }
+
+        .debug-info {
+            background: #1a1a1a;
+            color: #f4f1e8;
+            padding: 0.5rem;
+            font-size: 0.8rem;
+            border-bottom: 1px solid #8b4513;
+        }
+
+        .containers-wrapper {
+            display: flex;
+            flex: 1;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .scrolling-container {
+            flex: 1;
+            background: #1a1a1a;
+            height: 100%;
+            overflow: hidden;
+            position: relative;
+            border-right: 2px solid #8b4513;
+        }
+
+        .scrolling-container:last-child {
+            border-right: none;
+        }
+
+        .container-label {
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            background: #8b4513;
+            color: #f4f1e8;
+            padding: 2px 6px;
+            font-size: 0.7rem;
+            z-index: 10;
+            border-radius: 2px;
+        }
+
+        .cards-container {
+            height: 100%;
+            overflow-y: scroll;
+            overflow-x: hidden;
+            padding-top: 30px;
+            scrollbar-width: none;
+        }
+
+        .cards-container::-webkit-scrollbar {
+            display: none;
+        }
+
+        .tweet-card {
+            margin: 0.5rem;
+            padding: 0.8rem;
+            background: #d4c5a9;
+            border: 2px solid #8b4513;
+            box-shadow: 3px 3px 0px #654321;
+            font-size: 0.8rem;
+        }
+
+        .fast-container .tweet-card {
+            background: #e8dcc0;
+            border-color: #b8860b;
+            box-shadow: 3px 3px 0px #8b6914;
+        }
+
+        .slow-container .tweet-card {
+            background: #f0e6d2;
+            border-color: #cd853f;
+            box-shadow: 3px 3px 0px #a0522d;
+        }
+
+        .tweet-header {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+            align-items: center;
+        }
+
+        .tweet-avatar {
+            width: 20px;
+            height: 20px;
+            background: #8b4513;
+            color: #f4f1e8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: bold;
+        }
+
+        .tweet-username {
+            font-weight: bold;
+            color: #2c1810;
+            font-size: 0.8rem;
+        }
+
+        .tweet-handle {
+            color: #5c4a3a;
+            font-size: 0.7rem;
+        }
+
+        .tweet-content {
+            color: #2c1810;
+            line-height: 1.3;
+            margin-bottom: 0.5rem;
+        }
+
+        .tweet-actions {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.7rem;
+            color: #5c4a3a;
+            border-top: 1px solid #8b4513;
+            padding-top: 0.3rem;
+        }
+
+        .scroll-debug {
+            position: absolute;
+            bottom: 5px;
+            right: 5px;
+            background: rgba(0,0,0,0.7);
+            color: #f4f1e8;
+            padding: 2px 6px;
+            font-size: 0.6rem;
+            z-index: 10;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>SCROLLING DEBUG TEST</h1>
+    </div>
+
+    <div class="debug-info">
+        Status: <span id="status">Loading...</span> |
+        Fast Scroll: <span id="fast-status">Stopped</span> |
+        Slow Scroll: <span id="slow-status">Stopped</span>
+    </div>
+
+    <div class="containers-wrapper">
+        <div class="scrolling-container fast-container">
+            <div class="container-label">FAST</div>
+            <div class="scroll-debug" id="fast-debug">0</div>
+            <div class="cards-container" id="fast-container">
+                <!-- Fast cards -->
+            </div>
+        </div>
+
+        <div class="scrolling-container slow-container">
+            <div class="container-label">SLOW</div>
+            <div class="scroll-debug" id="slow-debug">0</div>
+            <div class="cards-container" id="slow-container">
+                <!-- Slow cards -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Simple card data
+        const fastCards = [
+            { id: 1, username: "user1", handle: "@user1", time: "1h", content: "Fast tweet 1 - This is scrolling fast!", replies: 5, retweets: 10, likes: 20 },
+            { id: 2, username: "user2", handle: "@user2", time: "2h", content: "Fast tweet 2 - Another quick message here.", replies: 3, retweets: 7, likes: 15 },
+            { id: 3, username: "user3", handle: "@user3", time: "3h", content: "Fast tweet 3 - Speed test in progress!", replies: 8, retweets: 12, likes: 25 },
+            { id: 4, username: "user4", handle: "@user4", time: "4h", content: "Fast tweet 4 - Moving at light speed!", replies: 6, retweets: 9, likes: 18 },
+            { id: 5, username: "user5", handle: "@user5", time: "5h", content: "Fast tweet 5 - Rapid fire content here!", replies: 4, retweets: 11, likes: 22 }
+        ];
+
+        const slowCards = [
+            { id: 1, username: "slow1", handle: "@slow1", time: "1d", content: "Slow tweet 1 - Taking time to think deeply about this message and its meaning.", replies: 15, retweets: 30, likes: 60 },
+            { id: 2, username: "slow2", handle: "@slow2", time: "2d", content: "Slow tweet 2 - Contemplating the nature of gradual progress and patience.", replies: 12, retweets: 25, likes: 50 },
+            { id: 3, username: "slow3", handle: "@slow3", time: "3d", content: "Slow tweet 3 - Sometimes the best things come to those who wait and observe.", replies: 18, retweets: 35, likes: 70 },
+            { id: 4, username: "slow4", handle: "@slow4", time: "4d", content: "Slow tweet 4 - Methodical approach to social media and life in general.", replies: 10, retweets: 20, likes: 45 },
+            { id: 5, username: "slow5", handle: "@slow5", time: "5d", content: "Slow tweet 5 - Deliberate and thoughtful communication is an art form.", replies: 14, retweets: 28, likes: 55 }
+        ];
+
+        function createTweetCard(card) {
+            return `
+                <div class="tweet-card">
+                    <div class="tweet-header">
+                        <div class="tweet-avatar">@</div>
+                        <div class="tweet-username">${card.username}</div>
+                        <div class="tweet-handle">${card.handle} · ${card.time}</div>
+                    </div>
+                    <div class="tweet-content">${card.content}</div>
+                    <div class="tweet-actions">
+                        <span>↳ ${card.replies}</span>
+                        <span>⟲ ${card.retweets}</span>
+                        <span>♡ ${card.likes}</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        function populateContainer(containerId, cards) {
+            const container = document.getElementById(containerId);
+            if (!container) {
+                console.error(`Container ${containerId} not found!`);
+                return;
+            }
+
+            // Create content multiple times for continuous scrolling
+            let html = '';
+            for (let i = 0; i < 5; i++) {
+                html += cards.map(createTweetCard).join('');
+            }
+            container.innerHTML = html;
+            console.log(`Populated ${containerId} with ${container.children.length} cards`);
+        }
+
+        function createAutoScroll(containerId, speed, debugId, statusId) {
+            const container = document.getElementById(containerId);
+            const debugElement = document.getElementById(debugId);
+            const statusElement = document.getElementById(statusId);
+
+            if (!container) {
+                console.error(`Container ${containerId} not found for scrolling!`);
+                return;
+            }
+
+            let scrollInterval;
+            let isScrolling = false;
+            let scrollPosition = 0;
+
+            function startScrolling() {
+                if (isScrolling) return;
+
+                console.log(`Starting scroll for ${containerId}`);
+                isScrolling = true;
+                statusElement.textContent = 'Running';
+                statusElement.style.color = '#00ff00';
+
+                scrollInterval = setInterval(() => {
+                    if (!container) return;
+
+                    scrollPosition++;
+                    container.scrollTop = scrollPosition;
+
+                    // Update debug info
+                    debugElement.textContent = scrollPosition;
+
+                    // Reset when reaching bottom
+                    if (container.scrollTop + container.clientHeight >= container.scrollHeight - 10) {
+                        scrollPosition = 0;
+                        container.scrollTop = 0;
+                        console.log(`Reset scroll for ${containerId}`);
+                    }
+                }, speed);
+            }
+
+            function stopScrolling() {
+                if (scrollInterval) {
+                    clearInterval(scrollInterval);
+                    scrollInterval = null;
+                    isScrolling = false;
+                    statusElement.textContent = 'Paused';
+                    statusElement.style.color = '#ffff00';
+                    console.log(`Stopped scroll for ${containerId}`);
+                }
+            }
+
+            // Hover to pause
+            container.addEventListener('mouseenter', stopScrolling);
+            container.addEventListener('mouseleave', startScrolling);
+
+            // Start after delay
+            setTimeout(() => {
+                startScrolling();
+            }, 1000);
+
+            return stopScrolling;
+        }
+
+        // Initialize when DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded, initializing...');
+
+            const statusElement = document.getElementById('status');
+            statusElement.textContent = 'Initializing...';
+
+            try {
+                // Populate containers
+                populateContainer('fast-container', fastCards);
+                populateContainer('slow-container', slowCards);
+
+                statusElement.textContent = 'Cards loaded, starting scroll...';
+
+                // Start scrolling with different speeds
+                createAutoScroll('fast-container', 50, 'fast-debug', 'fast-status');  // 50ms = fast
+                createAutoScroll('slow-container', 200, 'slow-debug', 'slow-status'); // 200ms = slow
+
+                setTimeout(() => {
+                    statusElement.textContent = 'Running';
+                    statusElement.style.color = '#00ff00';
+                }, 2000);
+
+            } catch (error) {
+                console.error('Error during initialization:', error);
+                statusElement.textContent = 'Error: ' + error.message;
+                statusElement.style.color = '#ff0000';
+            }
+        });
+    </script>
+</body>
+</html>

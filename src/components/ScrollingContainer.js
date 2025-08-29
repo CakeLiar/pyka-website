@@ -10,21 +10,23 @@ const ScrollingContainer = ({ cards, speed, className }) => {
     if (!container) return;
 
     const startAutoScroll = () => {
+      if (scrollIntervalRef.current) return;
+
+      console.log(`Starting scroll for container with speed ${speed}`);
+
       scrollIntervalRef.current = setInterval(() => {
         if (!container) return;
 
+        // Scroll down by 1 pixel
+        container.scrollTop += 1;
+
+        // Reset to top when reaching the bottom
         if (
           container.scrollTop + container.clientHeight >=
-          container.scrollHeight - 1
+          container.scrollHeight - 5
         ) {
-          // Reset to top when reaching the bottom
-          container.scrollTo({ top: 0, behavior: "auto" });
-        } else {
-          // Scroll down by 1 pixel
-          container.scrollTo({
-            top: container.scrollTop + 1,
-            behavior: "auto",
-          });
+          container.scrollTop = 0;
+          console.log("Reset scroll to top");
         }
       }, speed * 10); // Convert speed to milliseconds
     };
@@ -36,38 +38,123 @@ const ScrollingContainer = ({ cards, speed, className }) => {
       }
     };
 
-    // Start auto-scrolling after a small delay to ensure content is loaded
+    // Start auto-scrolling after content loads
     const timeoutId = setTimeout(() => {
-      startAutoScroll();
-    }, 100);
+      console.log(
+        `Container height: ${container.scrollHeight}px, client height: ${container.clientHeight}px`,
+      );
+      if (container.scrollHeight > container.clientHeight) {
+        startAutoScroll();
+      } else {
+        console.warn("Container not tall enough to scroll");
+      }
+    }, 500);
 
     // Pause scrolling on hover
     container.addEventListener("mouseenter", stopAutoScroll);
-    container.addEventListener("mouseleave", startAutoScroll);
+    container.addEventListener("mouseleave", () => {
+      setTimeout(startAutoScroll, 100);
+    });
 
     // Cleanup function
     return () => {
       clearTimeout(timeoutId);
       stopAutoScroll();
-      container.removeEventListener("mouseenter", stopAutoScroll);
-      container.removeEventListener("mouseleave", startAutoScroll);
+      if (container) {
+        container.removeEventListener("mouseenter", stopAutoScroll);
+        container.removeEventListener("mouseleave", startAutoScroll);
+      }
     };
   }, [speed, cards]);
 
   return (
     <div className={`scrolling-container ${className}`}>
       <div className="cards-container" ref={containerRef}>
+        {/* Triple the cards for continuous scrolling */}
         {cards.map((card) => (
-          <div key={card.id} className="card">
-            <h3 className="card-title">{card.title}</h3>
-            <p className="card-content">{card.content}</p>
+          <div key={card.id} className="tweet-card">
+            <div className="tweet-header">
+              <div className="tweet-avatar">@</div>
+              <div className="tweet-user-info">
+                <div className="tweet-username">{card.username}</div>
+                <div className="tweet-handle">
+                  {card.handle} · {card.time}
+                </div>
+              </div>
+            </div>
+            <div className="tweet-content">{card.content}</div>
+            <div className="tweet-actions">
+              <div className="tweet-action">
+                <span className="action-icon">↳</span>
+                <span className="action-count">{card.replies}</span>
+              </div>
+              <div className="tweet-action">
+                <span className="action-icon">⟲</span>
+                <span className="action-count">{card.retweets}</span>
+              </div>
+              <div className="tweet-action">
+                <span className="action-icon">♡</span>
+                <span className="action-count">{card.likes}</span>
+              </div>
+            </div>
           </div>
         ))}
-        {/* Duplicate cards for seamless scrolling */}
+        {/* Second set of cards */}
         {cards.map((card) => (
-          <div key={`duplicate-${card.id}`} className="card">
-            <h3 className="card-title">{card.title}</h3>
-            <p className="card-content">{card.content}</p>
+          <div key={`duplicate-${card.id}`} className="tweet-card">
+            <div className="tweet-header">
+              <div className="tweet-avatar">@</div>
+              <div className="tweet-user-info">
+                <div className="tweet-username">{card.username}</div>
+                <div className="tweet-handle">
+                  {card.handle} · {card.time}
+                </div>
+              </div>
+            </div>
+            <div className="tweet-content">{card.content}</div>
+            <div className="tweet-actions">
+              <div className="tweet-action">
+                <span className="action-icon">↳</span>
+                <span className="action-count">{card.replies}</span>
+              </div>
+              <div className="tweet-action">
+                <span className="action-icon">⟲</span>
+                <span className="action-count">{card.retweets}</span>
+              </div>
+              <div className="tweet-action">
+                <span className="action-icon">♡</span>
+                <span className="action-count">{card.likes}</span>
+              </div>
+            </div>
+          </div>
+        ))}
+        {/* Third set of cards */}
+        {cards.map((card) => (
+          <div key={`triple-${card.id}`} className="tweet-card">
+            <div className="tweet-header">
+              <div className="tweet-avatar">@</div>
+              <div className="tweet-user-info">
+                <div className="tweet-username">{card.username}</div>
+                <div className="tweet-handle">
+                  {card.handle} · {card.time}
+                </div>
+              </div>
+            </div>
+            <div className="tweet-content">{card.content}</div>
+            <div className="tweet-actions">
+              <div className="tweet-action">
+                <span className="action-icon">↳</span>
+                <span className="action-count">{card.replies}</span>
+              </div>
+              <div className="tweet-action">
+                <span className="action-icon">⟲</span>
+                <span className="action-count">{card.retweets}</span>
+              </div>
+              <div className="tweet-action">
+                <span className="action-icon">♡</span>
+                <span className="action-count">{card.likes}</span>
+              </div>
+            </div>
           </div>
         ))}
       </div>
