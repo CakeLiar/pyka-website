@@ -1,0 +1,453 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Auto-Scrolling Cards Demo - Retro Style</title>
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            body {
+                font-family: "Courier New", monospace;
+                background: #2c1810;
+                height: 100vh;
+                -webkit-font-smoothing: antialiased;
+                -moz-osx-font-smoothing: grayscale;
+                display: flex;
+                flex-direction: column;
+            }
+
+            .header {
+                background: #2c1810;
+                color: #f4f1e8;
+                padding: 1rem 0;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+                position: relative;
+                overflow: hidden;
+                border-bottom: 2px solid #8b4513;
+            }
+
+            .header-content {
+                max-width: 1200px;
+                margin: 0 auto;
+                padding: 0 1rem;
+                text-align: center;
+                position: relative;
+                z-index: 1;
+            }
+
+            .header-title {
+                font-size: 2rem;
+                font-weight: bold;
+                margin-bottom: 0.3rem;
+                text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+                letter-spacing: 2px;
+                font-family: "Courier New", monospace;
+                text-transform: uppercase;
+            }
+
+            .header-subtitle {
+                font-size: 0.9rem;
+                opacity: 0.8;
+                font-weight: normal;
+                letter-spacing: 1px;
+                font-family: "Courier New", monospace;
+                text-transform: lowercase;
+            }
+
+            .containers-wrapper {
+                display: flex;
+                flex: 1;
+                gap: 0;
+                padding: 0;
+                margin: 0;
+            }
+
+            .scrolling-container {
+                flex: 1;
+                background: #1a1a1a;
+                border-radius: 0;
+                box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.5);
+                overflow: hidden;
+                transition: none;
+                height: 100%;
+                position: relative;
+                isolation: isolate;
+            }
+
+            .scrolling-container:hover {
+                transform: none;
+                box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.5);
+            }
+
+            .cards-container {
+                height: 100%;
+                overflow-y: scroll;
+                overflow-x: hidden;
+                padding: 0;
+                scrollbar-width: none;
+                scrollbar-color: transparent transparent;
+                scroll-behavior: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .cards-container::-webkit-scrollbar {
+                width: 0px;
+                display: none;
+            }
+
+            .cards-container::-webkit-scrollbar-track {
+                background: transparent;
+            }
+
+            .cards-container::-webkit-scrollbar-thumb {
+                background: transparent;
+            }
+
+            .cards-container::-webkit-scrollbar-thumb:hover {
+                background: transparent;
+            }
+
+            .card {
+                margin: 0.5rem;
+                padding: 1rem;
+                background: #f4f1e8;
+                border-radius: 3px;
+                box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+                border: 1px solid #d4c5a9;
+                transition: none;
+                position: relative;
+                overflow: hidden;
+                font-family: "Courier New", monospace;
+            }
+
+            .fast-container .card {
+                border-color: #8b4513;
+                background: #f0e6d2;
+            }
+
+            .slow-container .card {
+                border-color: #654321;
+                background: #ede0c8;
+            }
+
+            .card:hover {
+                transform: none;
+                box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            }
+
+            .card::before {
+                content: "";
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: none;
+                transform: none;
+                transition: none;
+            }
+
+            .card:hover::before {
+                transform: none;
+            }
+
+            .card-title {
+                color: #2c1810;
+                font-size: 1rem;
+                font-weight: bold;
+                margin-bottom: 0.5rem;
+                text-align: left;
+                position: relative;
+                z-index: 1;
+                font-family: "Courier New", monospace;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+            }
+
+            .card-content {
+                color: #3c2415;
+                font-size: 0.9rem;
+                line-height: 1.4;
+                text-align: left;
+                position: relative;
+                z-index: 1;
+                font-family: "Courier New", monospace;
+            }
+
+            @media (max-width: 768px) {
+                .containers-wrapper {
+                    flex-direction: column;
+                    padding: 0;
+                    gap: 0;
+                }
+
+                .scrolling-container {
+                    max-width: none;
+                    margin: 0;
+                    height: 50vh;
+                }
+
+                .cards-container {
+                    height: 100%;
+                }
+
+                .card {
+                    margin: 0.3rem;
+                    padding: 0.8rem;
+                }
+
+                .card-title {
+                    font-size: 0.9rem;
+                }
+
+                .card-content {
+                    font-size: 0.8rem;
+                }
+
+                .header {
+                    padding: 0.8rem 0;
+                }
+
+                .header-content {
+                    padding: 0 0.5rem;
+                }
+
+                .header-title {
+                    font-size: 1.5rem;
+                }
+
+                .header-subtitle {
+                    font-size: 0.8rem;
+                }
+            }
+
+            @media (max-width: 480px) {
+                .cards-container {
+                    height: 100%;
+                }
+
+                .card-title {
+                    font-size: 0.8rem;
+                }
+
+                .card-content {
+                    font-size: 0.75rem;
+                }
+
+                .header-title {
+                    font-size: 1.2rem;
+                }
+
+                .header-subtitle {
+                    font-size: 0.7rem;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="app">
+            <header class="header">
+                <div class="header-content">
+                    <h1 class="header-title">Auto-Scrolling Cards App</h1>
+                    <p class="header-subtitle">
+                        Two containers with different scrolling speeds
+                    </p>
+                </div>
+            </header>
+
+            <div class="containers-wrapper">
+                <div class="scrolling-container fast-container">
+                    <div class="cards-container" id="fast-container">
+                        <!-- Fast cards will be generated by JavaScript -->
+                    </div>
+                </div>
+
+                <div class="scrolling-container slow-container">
+                    <div class="cards-container" id="slow-container">
+                        <!-- Slow cards will be generated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            // Sample data for the cards
+            const fastCards = [
+                {
+                    id: 1,
+                    title: "Fast Card 1",
+                    content:
+                        "This is a fast scrolling card with some content to display.",
+                },
+                {
+                    id: 2,
+                    title: "Fast Card 2",
+                    content:
+                        "Another fast card with different content and information.",
+                },
+                {
+                    id: 3,
+                    title: "Fast Card 3",
+                    content:
+                        "Fast scrolling card number three with unique content.",
+                },
+                {
+                    id: 4,
+                    title: "Fast Card 4",
+                    content:
+                        "Fourth fast card containing interesting information.",
+                },
+                {
+                    id: 5,
+                    title: "Fast Card 5",
+                    content:
+                        "Fifth fast card with more content to scroll through.",
+                },
+                {
+                    id: 6,
+                    title: "Fast Card 6",
+                    content:
+                        "Sixth fast card with additional details and text.",
+                },
+                {
+                    id: 7,
+                    title: "Fast Card 7",
+                    content:
+                        "Seventh fast card with even more content to display.",
+                },
+                {
+                    id: 8,
+                    title: "Fast Card 8",
+                    content: "Eighth fast card with comprehensive information.",
+                },
+            ];
+
+            const slowCards = [
+                {
+                    id: 1,
+                    title: "Slow Card 1",
+                    content:
+                        "This is a slow scrolling card with detailed content and descriptions.",
+                },
+                {
+                    id: 2,
+                    title: "Slow Card 2",
+                    content:
+                        "Another slow card with extensive information and longer text content.",
+                },
+                {
+                    id: 3,
+                    title: "Slow Card 3",
+                    content:
+                        "Slow scrolling card number three with comprehensive details.",
+                },
+                {
+                    id: 4,
+                    title: "Slow Card 4",
+                    content:
+                        "Fourth slow card containing elaborate information and descriptions.",
+                },
+                {
+                    id: 5,
+                    title: "Slow Card 5",
+                    content:
+                        "Fifth slow card with thorough content and detailed explanations.",
+                },
+                {
+                    id: 6,
+                    title: "Slow Card 6",
+                    content:
+                        "Sixth slow card with in-depth information and extended content.",
+                },
+                {
+                    id: 7,
+                    title: "Slow Card 7",
+                    content:
+                        "Seventh slow card with comprehensive details and descriptions.",
+                },
+                {
+                    id: 8,
+                    title: "Slow Card 8",
+                    content:
+                        "Eighth slow card with complete information and thorough content.",
+                },
+            ];
+
+            function createCard(card) {
+                return `
+                <div class="card">
+                    <h3 class="card-title">${card.title}</h3>
+                    <p class="card-content">${card.content}</p>
+                </div>
+            `;
+            }
+
+            function populateContainer(containerId, cards) {
+                const container = document.getElementById(containerId);
+                // Add cards twice for seamless scrolling
+                const cardsHTML = cards.map(createCard).join("");
+                container.innerHTML = cardsHTML + cardsHTML;
+            }
+
+            function createAutoScroll(containerId, speed) {
+                const container = document.getElementById(containerId);
+                let scrollInterval;
+
+                function startScrolling() {
+                    scrollInterval = setInterval(() => {
+                        if (!container) return;
+
+                        if (
+                            container.scrollTop + container.clientHeight >=
+                            container.scrollHeight - 1
+                        ) {
+                            // Reset to top when reaching the bottom
+                            container.scrollTo({ top: 0, behavior: "auto" });
+                        } else {
+                            // Scroll down by 1 pixel
+                            container.scrollTo({
+                                top: container.scrollTop + 1,
+                                behavior: "auto",
+                            });
+                        }
+                    }, speed * 10); // Convert speed to milliseconds
+                }
+
+                function stopScrolling() {
+                    if (scrollInterval) {
+                        clearInterval(scrollInterval);
+                        scrollInterval = null;
+                    }
+                }
+
+                // Start auto-scrolling after a small delay to ensure content is loaded
+                setTimeout(() => {
+                    startScrolling();
+                }, 100);
+
+                // Pause scrolling on hover
+                container.addEventListener("mouseenter", stopScrolling);
+                container.addEventListener("mouseleave", startScrolling);
+
+                // Return cleanup function
+                return stopScrolling;
+            }
+
+            // Initialize the app when DOM is loaded
+            document.addEventListener("DOMContentLoaded", function () {
+                // Populate containers with cards
+                populateContainer("fast-container", fastCards);
+                populateContainer("slow-container", slowCards);
+
+                // Start auto-scrolling with different speeds
+                createAutoScroll("fast-container", 2); // Fast scrolling (20ms intervals)
+                createAutoScroll("slow-container", 5); // Slow scrolling (50ms intervals)
+            });
+        </script>
+    </body>
+</html>

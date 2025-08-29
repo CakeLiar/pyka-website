@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Independent Scrolling Test</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Courier New", monospace;
+            background: #2c1810;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .header {
+            background: #2c1810;
+            color: #f4f1e8;
+            padding: 1rem;
+            border-bottom: 2px solid #8b4513;
+            text-align: center;
+        }
+
+        .containers-wrapper {
+            display: flex;
+            flex: 1;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .scrolling-container {
+            flex: 1;
+            background: #1a1a1a;
+            height: 100%;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .container-label {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(139, 69, 19, 0.8);
+            color: #f4f1e8;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-size: 0.8rem;
+            z-index: 10;
+        }
+
+        .cards-container {
+            height: 100%;
+            overflow-y: scroll;
+            overflow-x: hidden;
+            padding: 0;
+            scrollbar-width: none;
+        }
+
+        .cards-container::-webkit-scrollbar {
+            width: 0px;
+            display: none;
+        }
+
+        .card {
+            margin: 0.5rem;
+            padding: 1rem;
+            background: #f4f1e8;
+            border-radius: 3px;
+            box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            border: 1px solid #d4c5a9;
+            font-family: "Courier New", monospace;
+        }
+
+        .fast-container .card {
+            border-color: #e74c3c;
+            background: #ffe6e6;
+        }
+
+        .slow-container .card {
+            border-color: #27ae60;
+            background: #e6ffe6;
+        }
+
+        .card-title {
+            color: #2c1810;
+            font-size: 1rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .card-content {
+            color: #3c2415;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Independent Scrolling Test</h1>
+        <p>Left = Fast (Red) | Right = Slow (Green)</p>
+    </div>
+
+    <div class="containers-wrapper">
+        <div class="scrolling-container fast-container">
+            <div class="container-label">FAST SCROLL</div>
+            <div class="cards-container" id="fast-container"></div>
+        </div>
+
+        <div class="scrolling-container slow-container">
+            <div class="container-label">SLOW SCROLL</div>
+            <div class="cards-container" id="slow-container"></div>
+        </div>
+    </div>
+
+    <script>
+        // Generate more cards for better testing
+        function generateCards(prefix, count) {
+            const cards = [];
+            for (let i = 1; i <= count; i++) {
+                cards.push({
+                    id: i,
+                    title: `${prefix} Card ${i}`,
+                    content: `This is ${prefix.toLowerCase()} card number ${i} with some content to make it scrollable. Lorem ipsum dolor sit amet, consectetur adipiscing elit.`
+                });
+            }
+            return cards;
+        }
+
+        const fastCards = generateCards('Fast', 20);
+        const slowCards = generateCards('Slow', 20);
+
+        function createCard(card) {
+            return `
+                <div class="card">
+                    <h3 class="card-title">${card.title}</h3>
+                    <p class="card-content">${card.content}</p>
+                </div>
+            `;
+        }
+
+        function populateContainer(containerId, cards) {
+            const container = document.getElementById(containerId);
+            // Add cards multiple times for continuous scrolling
+            const cardsHTML = cards.map(createCard).join('');
+            container.innerHTML = cardsHTML + cardsHTML + cardsHTML;
+        }
+
+        function createAutoScroll(containerId, speed) {
+            const container = document.getElementById(containerId);
+            let scrollInterval;
+            let isScrolling = false;
+
+            function startScrolling() {
+                if (isScrolling) return;
+                isScrolling = true;
+
+                scrollInterval = setInterval(() => {
+                    if (!container) return;
+
+                    // Check if we've reached the bottom
+                    if (container.scrollTop + container.clientHeight >= container.scrollHeight - 1) {
+                        // Reset to top smoothly
+                        container.scrollTop = 0;
+                    } else {
+                        // Scroll down by 1 pixel
+                        container.scrollTop += 1;
+                    }
+                }, speed * 10);
+            }
+
+            function stopScrolling() {
+                if (scrollInterval) {
+                    clearInterval(scrollInterval);
+                    scrollInterval = null;
+                    isScrolling = false;
+                }
+            }
+
+            // Start after content loads
+            setTimeout(startScrolling, 200);
+
+            // Pause on hover
+            container.addEventListener('mouseenter', stopScrolling);
+            container.addEventListener('mouseleave', () => {
+                setTimeout(startScrolling, 100);
+            });
+
+            return stopScrolling;
+        }
+
+        // Initialize when DOM is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            // Populate containers
+            populateContainer('fast-container', fastCards);
+            populateContainer('slow-container', slowCards);
+
+            // Start scrolling with different speeds
+            createAutoScroll('fast-container', 1); // Very fast (10ms intervals)
+            createAutoScroll('slow-container', 8); // Slower (80ms intervals)
+
+            console.log('Scrolling initialized for both containers');
+        });
+    </script>
+</body>
+</html>
