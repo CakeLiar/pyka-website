@@ -306,6 +306,8 @@
                 const homePage = document.getElementById("home-page");
                 const searchInput = overlay.querySelector(".search-input");
 
+                if (!spotlightVisible) return; // Prevent multiple calls
+
                 spotlightVisible = false;
 
                 // Hide spotlight
@@ -316,10 +318,13 @@
                 if (searchInput) {
                     searchInput.value = "";
                 }
-                scrollAccumulator = 0;
 
                 setTimeout(() => {
-                    overlay.style.display = "none";
+                    if (!spotlightVisible) {
+                        // Only hide if still meant to be hidden
+                        overlay.style.display = "none";
+                        scrollAccumulator = 0; // Reset accumulator after hiding
+                    }
                 }, 300);
             }
 
@@ -343,7 +348,7 @@
                             0,
                             scrollAccumulator + delta,
                         );
-                        if (scrollAccumulator <= 0) {
+                        if (scrollAccumulator <= 10) {
                             hideSpotlight();
                         } else {
                             const progress = Math.min(
