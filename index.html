@@ -3,31 +3,74 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Retro Tweet Stream - Old School Social Media</title>
+        <title>pyka.boo - Control Your Internet</title>
         <link rel="stylesheet" href="styles.css" />
     </head>
     <body>
-        <div class="header">
-            <h1 class="header-title">pyka.boo</h1>
-            <p class="header-subtitle">control your internet.</p>
-        </div>
-
-        <div class="containers-wrapper">
-            <div class="scrolling-container fast-container">
-                <div class="cards-container" id="fast-container">
-                    <!-- Fast cards -->
-                </div>
+        <!-- State 0: Main Twitter Feed (Always visible) -->
+        <div id="home-page" class="home-page">
+            <div class="header">
+                <h1 class="header-title">pyka.boo</h1>
+                <p class="header-subtitle">control your internet.</p>
             </div>
 
-            <div class="scrolling-container slow-container">
-                <div class="cards-container" id="slow-container">
-                    <!-- Slow cards -->
+            <div class="containers-wrapper">
+                <div class="scrolling-container fast-container">
+                    <div class="cards-container" id="fast-container">
+                        <!-- Fast cards -->
+                    </div>
+                </div>
+
+                <div class="scrolling-container slow-container">
+                    <div class="cards-container" id="slow-container">
+                        <!-- Slow cards -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- State 1: Spotlight Overlay (Appears on top) -->
+        <div id="spotlight-overlay" class="spotlight-overlay">
+            <div class="spotlight-backdrop"></div>
+            <div class="spotlight-container">
+                <div class="spotlight-content">
+                    <div class="search-bar">
+                        <input type="text" class="search-input" readonly />
+                    </div>
+                    <div class="spotlight-results">
+                        <div class="result-item">
+                            <span class="result-icon">🔍</span>
+                            <span class="result-text"
+                                >Search through feeds</span
+                            >
+                        </div>
+                        <div class="result-item">
+                            <span class="result-icon">📱</span>
+                            <span class="result-text">Control settings</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-icon">🌐</span>
+                            <span class="result-text">Network options</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-icon">⚡</span>
+                            <span class="result-text">Speed controls</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-icon">🎨</span>
+                            <span class="result-text">Theme settings</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-icon">🔒</span>
+                            <span class="result-text">Privacy options</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
 
         <script>
-            // Tweet data for fast and slow streams
+            // Tweet data
             const fastCards = [
                 {
                     id: 1,
@@ -83,39 +126,6 @@
                     replies: 7,
                     retweets: 18,
                     likes: 89,
-                },
-                {
-                    id: 6,
-                    username: "Old School Dev",
-                    handle: "@oldschoolweb",
-                    time: "12h",
-                    content:
-                        "Why do modern websites need 50MB of JavaScript just to display text? Bring back the 90s web!",
-                    replies: 34,
-                    retweets: 92,
-                    likes: 203,
-                },
-                {
-                    id: 7,
-                    username: "Terminal Fan",
-                    handle: "@terminal_life",
-                    time: "14h",
-                    content:
-                        "GUI is overrated. Real developers use command line interfaces. Change my mind. 💻 #terminal",
-                    replies: 19,
-                    retweets: 28,
-                    likes: 71,
-                },
-                {
-                    id: 8,
-                    username: "Vintage Tech",
-                    handle: "@vintagetech90s",
-                    time: "16h",
-                    content:
-                        "Found my old CRT monitor in the basement. Still works perfectly! They don't make them like this anymore.",
-                    replies: 11,
-                    retweets: 22,
-                    likes: 58,
                 },
             ];
 
@@ -175,167 +185,188 @@
                     retweets: 38,
                     likes: 95,
                 },
-                {
-                    id: 6,
-                    username: "Quality First",
-                    handle: "@qualityfirst_",
-                    time: "6d",
-                    content:
-                        "Feature complete doesn't mean quality complete. Testing, optimization, and documentation matter too.",
-                    replies: 27,
-                    retweets: 82,
-                    likes: 156,
-                },
-                {
-                    id: 7,
-                    username: "Philosophy Dev",
-                    handle: "@philosophydev",
-                    time: "7d",
-                    content:
-                        "In programming, as in life, sometimes the best action is patient inaction. Think before you type.",
-                    replies: 8,
-                    retweets: 19,
-                    likes: 73,
-                },
-                {
-                    id: 8,
-                    username: "The Contemplator",
-                    handle: "@contemplator_",
-                    time: "1w",
-                    content:
-                        "Every line of code is a decision. Every decision shapes the future. Choose wisely, code slowly.",
-                    replies: 16,
-                    retweets: 41,
-                    likes: 127,
-                },
             ];
+
+            // State Management
+            let scrollAccumulator = 0;
+            const scrollThreshold = 200;
+            let spotlightVisible = false;
+
+            // Typing animation
+            const typingMessage = "escape the algorithm...";
+            let typingProgress = 0;
 
             function createTweetCard(card) {
                 return `
-                <div class="tweet-card">
-                    <div class="tweet-header">
-                        <div class="tweet-avatar">${card.username.charAt(0).toUpperCase()}</div>
-                        <div class="tweet-user-info">
-                            <span class="tweet-username">${card.username}</span>
-                            <span class="tweet-handle">${card.handle}</span>
-                            <span class="tweet-separator">·</span>
-                            <span class="tweet-time">${card.time}</span>
+                    <div class="tweet-card">
+                        <div class="tweet-header">
+                            <div class="tweet-avatar">${card.username.charAt(0).toUpperCase()}</div>
+                            <div class="tweet-user-info">
+                                <span class="tweet-username">${card.username}</span>
+                                <span class="tweet-handle">${card.handle}</span>
+                                <span class="tweet-separator">·</span>
+                                <span class="tweet-time">${card.time}</span>
+                            </div>
+                        </div>
+                        <div class="tweet-content">${card.content}</div>
+                        <div class="tweet-actions">
+                            <div class="tweet-action reply">
+                                <span class="action-icon">💬</span>
+                                <span class="action-count">${card.replies}</span>
+                            </div>
+                            <div class="tweet-action retweet">
+                                <span class="action-icon">🔄</span>
+                                <span class="action-count">${card.retweets}</span>
+                            </div>
+                            <div class="tweet-action like">
+                                <span class="action-icon">❤️</span>
+                                <span class="action-count">${card.likes}</span>
+                            </div>
                         </div>
                     </div>
-                    <div class="tweet-content">${card.content}</div>
-                    <div class="tweet-actions">
-                        <div class="tweet-action reply">
-                            <span class="action-icon">💬</span>
-                            <span class="action-count">${card.replies}</span>
-                        </div>
-                        <div class="tweet-action retweet">
-                            <span class="action-icon">🔄</span>
-                            <span class="action-count">${card.retweets}</span>
-                        </div>
-                        <div class="tweet-action like">
-                            <span class="action-icon">❤️</span>
-                            <span class="action-count">${card.likes}</span>
-                        </div>
-                        <div class="tweet-action share">
-                            <span class="action-icon">📤</span>
-                        </div>
-                    </div>
-                </div>
-            `;
+                `;
             }
 
             function populateContainer(containerId, cards) {
                 const container = document.getElementById(containerId);
-                if (!container) {
-                    console.error(`Container ${containerId} not found!`);
-                    return;
-                }
+                if (!container) return;
 
-                // Create content multiple times for continuous scrolling
                 let html = "";
-                for (let i = 0; i < 5; i++) {
+                for (let i = 0; i < 8; i++) {
                     html += cards.map(createTweetCard).join("");
                 }
                 container.innerHTML = html;
-                console.log(
-                    `Populated ${containerId} with ${container.children.length} cards`,
-                );
             }
 
             function createAutoScroll(containerId, speed) {
                 const container = document.getElementById(containerId);
-
-                if (!container) {
-                    console.error(
-                        `Container ${containerId} not found for scrolling!`,
-                    );
-                    return;
-                }
+                if (!container) return;
 
                 let scrollInterval;
-                let isScrolling = false;
                 let scrollPosition = 0;
 
                 function startScrolling() {
-                    if (isScrolling) return;
-
-                    console.log(`Starting scroll for ${containerId}`);
-                    isScrolling = true;
-
                     scrollInterval = setInterval(() => {
-                        if (!container) return;
-
                         scrollPosition++;
                         container.scrollTop = scrollPosition;
 
-                        // Reset when reaching bottom
                         if (
                             container.scrollTop + container.clientHeight >=
                             container.scrollHeight - 10
                         ) {
                             scrollPosition = 0;
                             container.scrollTop = 0;
-                            console.log(`Reset scroll for ${containerId}`);
                         }
                     }, speed);
                 }
 
-                function stopScrolling() {
-                    if (scrollInterval) {
-                        clearInterval(scrollInterval);
-                        scrollInterval = null;
-                        isScrolling = false;
-                        console.log(`Stopped scroll for ${containerId}`);
-                    }
-                }
-
-                // Auto-scroll only - no manual control
-
-                // Start after delay
-                setTimeout(() => {
-                    startScrolling();
-                }, 1000);
-
-                return stopScrolling;
+                setTimeout(startScrolling, 500);
             }
 
-            // Initialize when DOM is loaded
-            document.addEventListener("DOMContentLoaded", function () {
-                console.log("DOM loaded, initializing retro tweet stream...");
+            function showSpotlight(progress) {
+                const overlay = document.getElementById("spotlight-overlay");
+                const container = overlay.querySelector(".spotlight-container");
+                const homePage = document.getElementById("home-page");
+                const searchInput = overlay.querySelector(".search-input");
 
-                try {
-                    // Populate containers
-                    populateContainer("fast-container", fastCards);
-                    populateContainer("slow-container", slowCards);
-
-                    // Start scrolling with different speeds
-                    createAutoScroll("fast-container", 8); // Slower scrolling (50ms intervals)
-                    createAutoScroll("slow-container", 12); // Faster scrolling (15ms intervals)
-
-                    console.log("Retro tweet stream initialized successfully");
-                } catch (error) {
-                    console.error("Error during initialization:", error);
+                if (!spotlightVisible && progress > 0) {
+                    spotlightVisible = true;
+                    overlay.style.display = "flex";
                 }
+
+                // Animate spotlight
+                const opacity = Math.min(progress * 2, 1);
+                const scale = 0.8 + progress * 0.2;
+                const translateY = 30 - progress * 30;
+
+                overlay.style.opacity = opacity;
+                container.style.transform = `scale(${scale}) translateY(${translateY}px)`;
+
+                // Typing animation based on scroll
+                const extendedProgress = Math.min(scrollAccumulator / 5000, 1);
+                const charactersToShow = Math.floor(
+                    extendedProgress * typingMessage.length,
+                );
+                let displayText = typingMessage.substring(0, charactersToShow);
+
+                // Add blinking cursor while typing
+                if (charactersToShow < typingMessage.length && progress > 0.1) {
+                    const shouldBlink = Math.floor(Date.now() / 500) % 2;
+                    displayText += shouldBlink ? "|" : "";
+                }
+
+                if (searchInput) {
+                    searchInput.value = displayText;
+                }
+            }
+
+            function hideSpotlight() {
+                const overlay = document.getElementById("spotlight-overlay");
+                const container = overlay.querySelector(".spotlight-container");
+                const homePage = document.getElementById("home-page");
+                const searchInput = overlay.querySelector(".search-input");
+
+                spotlightVisible = false;
+
+                // Hide spotlight
+                overlay.style.opacity = "0";
+                container.style.transform = "scale(0.8) translateY(30px)";
+
+                // Clear input and reset scroll accumulator
+                if (searchInput) {
+                    searchInput.value = "";
+                }
+                scrollAccumulator = 0;
+
+                setTimeout(() => {
+                    overlay.style.display = "none";
+                }, 300);
+            }
+
+            // Scroll event handler
+            document.addEventListener(
+                "wheel",
+                function (e) {
+                    const delta = e.deltaY;
+
+                    if (delta > 0) {
+                        // Scrolling down
+                        scrollAccumulator += delta;
+                        const progress = Math.min(
+                            scrollAccumulator / scrollThreshold,
+                            1,
+                        );
+                        showSpotlight(progress);
+                    } else if (delta < 0) {
+                        // Scrolling up
+                        scrollAccumulator = Math.max(
+                            0,
+                            scrollAccumulator + delta,
+                        );
+                        if (scrollAccumulator <= 0) {
+                            hideSpotlight();
+                        } else {
+                            const progress = Math.min(
+                                scrollAccumulator / scrollThreshold,
+                                1,
+                            );
+                            showSpotlight(progress);
+                        }
+                    }
+
+                    e.preventDefault();
+                },
+                { passive: false },
+            );
+
+            // Initialize
+            document.addEventListener("DOMContentLoaded", function () {
+                populateContainer("fast-container", fastCards);
+                populateContainer("slow-container", slowCards);
+                createAutoScroll("fast-container", 50);
+                createAutoScroll("slow-container", 15);
+
+                console.log("Two-state scroll system initialized");
             });
         </script>
     </body>
