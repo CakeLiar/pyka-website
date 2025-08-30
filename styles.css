@@ -234,7 +234,8 @@ body {
     height: 100vh;
     display: none;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start;
+    padding-top: 20vh;
     z-index: 1000;
     opacity: 0;
     transition: opacity 0.3s ease;
@@ -383,4 +384,81 @@ body {
     .header-subtitle {
         font-size: 0.7rem;
     }
+}
+
+/* Retro Mode Styles */
+.retro-mode {
+    --bg-primary: #0a0f1a;
+    --bg-secondary: #1a1f2e;
+    --bg-hover: #2a2f3e;
+    --text-primary: #00ff41;
+    --text-secondary: #00cc33;
+    --border-color: #00ff41;
+    background: linear-gradient(135deg, #0a0f1a 0%, #1a0f2a 100%);
+    animation: matrixGlow 2s ease-in-out infinite alternate;
+}
+
+@keyframes matrixGlow {
+    0% {
+        filter: hue-rotate(0deg) brightness(1);
+    }
+    100% {
+        filter: hue-rotate(10deg) brightness(1.1);
+    }
+}
+
+.retro-mode .header {
+    text-align: left;
+    padding-left: 40px;
+    animation: slideLeft 1s ease-out;
+}
+
+@keyframes slideLeft {
+    from {
+        text-align: center;
+        padding-left: 0;
+        transform: translateX(0);
+    }
+    to {
+        text-align: left;
+        padding-left: 40px;
+        transform: translateX(-20px);
+    }
+}
+
+.retro-mode .header-title {
+    font-family: "Courier New", monospace;
+    color: #00ff41;
+    text-shadow:
+        0 0 10px #00ff41,
+        0 0 20px #00ff41,
+        0 0 40px #00ff41;
+    font-weight: bold;
+}
+
+.retro-mode .header-subtitle {
+    font-family: "Courier New", monospace;
+    color: #00cc33;
+    text-shadow: 0 0 5px #00cc33;
+}
+
+.retro-mode .tweet-card {
+    background: rgba(0, 255, 65, 0.1);
+    border: 1px solid #00ff41;
+    box-shadow: 0 0 15px rgba(0, 255, 65, 0.3);
+}
+
+.retro-mode .spotlight-container {
+    border: 2px solid #00ff41;
+    box-shadow:
+        0 0 30px rgba(0, 255, 65, 0.5),
+        inset 0 0 30px rgba(0, 255, 65, 0.1);
+}
+
+.retro-mode .search-input {
+    background: rgba(0, 0, 0, 0.8);
+    color: #00ff41;
+    border: 1px solid #00ff41;
+    font-family: "Courier New", monospace;
+    text-shadow: 0 0 5px #00ff41;
 }

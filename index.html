@@ -39,30 +39,24 @@
                     </div>
                     <div class="spotlight-results">
                         <div class="result-item">
-                            <span class="result-icon">🔍</span>
-                            <span class="result-text"
-                                >Search through feeds</span
-                            >
-                        </div>
-                        <div class="result-item">
                             <span class="result-icon">📱</span>
-                            <span class="result-text">Control settings</span>
+                            <span class="result-text">filter politics</span>
                         </div>
                         <div class="result-item">
                             <span class="result-icon">🌐</span>
-                            <span class="result-text">Network options</span>
+                            <span class="result-text"
+                                >see potential clients</span
+                            >
                         </div>
                         <div class="result-item">
                             <span class="result-icon">⚡</span>
-                            <span class="result-text">Speed controls</span>
+                            <span class="result-text"
+                                >filter hateful content</span
+                            >
                         </div>
                         <div class="result-item">
                             <span class="result-icon">🎨</span>
-                            <span class="result-text">Theme settings</span>
-                        </div>
-                        <div class="result-item">
-                            <span class="result-icon">🔒</span>
-                            <span class="result-text">Privacy options</span>
+                            <span class="result-text">remove ads</span>
                         </div>
                     </div>
                 </div>
@@ -192,9 +186,31 @@
             const scrollThreshold = 200;
             let spotlightVisible = false;
 
-            // Typing animation
-            const typingMessage = "escape the algorithm...";
-            let typingProgress = 0;
+            // Multi-state scroll system
+            const scrollStates = [
+                {
+                    type: "type",
+                    message: "design your own recommendation system...",
+                    threshold: 5000,
+                },
+                {
+                    type: "delete",
+                    message: "design your own recommendation system...",
+                    threshold: 8000,
+                },
+                {
+                    type: "type",
+                    message: "make website look like it was made in the 90s...",
+                    threshold: 12000,
+                },
+                {
+                    type: "loading",
+                    message: "loading",
+                    threshold: 15000,
+                },
+            ];
+            let currentStateIndex = 0;
+            const maxScrollLimit = 18000; // Limit scroll to prevent going too far beyond retro mode
 
             function createTweetCard(card) {
                 return `
@@ -282,21 +298,72 @@
                 overlay.style.opacity = opacity;
                 container.style.transform = `scale(${scale}) translateY(${translateY}px)`;
 
-                // Typing animation based on scroll
-                const extendedProgress = Math.min(scrollAccumulator / 5000, 1);
-                const charactersToShow = Math.floor(
-                    extendedProgress * typingMessage.length,
-                );
-                let displayText = typingMessage.substring(0, charactersToShow);
+                // Multi-state typing animation
+                let displayText = "";
+                let showCursor = false;
 
-                // Add blinking cursor while typing
-                if (charactersToShow < typingMessage.length && progress > 0.1) {
+                // Find current state based on scroll
+                for (let i = 0; i < scrollStates.length; i++) {
+                    if (scrollAccumulator <= scrollStates[i].threshold) {
+                        currentStateIndex = i;
+                        break;
+                    }
+                    if (i === scrollStates.length - 1) {
+                        currentStateIndex = i;
+                    }
+                }
+
+                const currentState = scrollStates[currentStateIndex];
+                const prevThreshold =
+                    currentStateIndex > 0
+                        ? scrollStates[currentStateIndex - 1].threshold
+                        : 0;
+                const stateProgress = Math.min(
+                    (scrollAccumulator - prevThreshold) /
+                        (currentState.threshold - prevThreshold),
+                    1,
+                );
+
+                if (currentState.type === "type") {
+                    const charactersToShow = Math.floor(
+                        stateProgress * currentState.message.length,
+                    );
+                    displayText = currentState.message.substring(
+                        0,
+                        charactersToShow,
+                    );
+                    showCursor = charactersToShow < currentState.message.length;
+                } else if (currentState.type === "delete") {
+                    const charactersToDelete = Math.floor(
+                        stateProgress * currentState.message.length,
+                    );
+                    displayText = currentState.message.substring(
+                        0,
+                        currentState.message.length - charactersToDelete,
+                    );
+                    showCursor =
+                        charactersToDelete < currentState.message.length;
+                } else if (currentState.type === "loading") {
+                    const dots = Math.floor((Date.now() / 300) % 4);
+                    displayText = "loading" + ".".repeat(dots);
+                    showCursor = false;
+                }
+
+                // Add blinking cursor when needed
+                if (showCursor && progress > 0.1) {
                     const shouldBlink = Math.floor(Date.now() / 500) % 2;
                     displayText += shouldBlink ? "|" : "";
                 }
 
                 if (searchInput) {
                     searchInput.value = displayText;
+                }
+
+                // Change page appearance based on scroll state
+                if (scrollAccumulator > 15000) {
+                    document.body.classList.add("retro-mode");
+                } else {
+                    document.body.classList.remove("retro-mode");
                 }
             }
 
@@ -336,7 +403,10 @@
 
                     if (delta > 0) {
                         // Scrolling down
-                        scrollAccumulator += delta;
+                        scrollAccumulator = Math.min(
+                            scrollAccumulator + delta,
+                            maxScrollLimit,
+                        );
                         const progress = Math.min(
                             scrollAccumulator / scrollThreshold,
                             1,
