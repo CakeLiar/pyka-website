@@ -2,22 +2,15 @@
 
 A React application featuring a header and two containers with auto-scrolling cards at different speeds.
 
-## Features
+
 
 - **Header**: Clean, animated header with gradient background
 - **Two Scrolling Containers**: 
   - Fast scrolling container (red theme)
   - Slow scrolling container (green theme)
 - **Auto-scrolling**: Cards automatically scroll at different speeds
-- **Hover to Pause**: Scrolling pauses when you hover over a container
-- **Responsive Design**: Works on desktop, tablet, and mobile devices
-- **Smooth Animations**: Hover effects and transitions throughout
 
 ## Prerequisites
-
-Before running this application, make sure you have the following installed:
-
-- **Node.js** (version 14 or higher)
 - **npm** (comes with Node.js) or **yarn**
 
 ### Installing Node.js
@@ -67,18 +60,10 @@ Before running this application, make sure you have the following installed:
    ```
    
    Or with yarn:
-   ```bash
-   yarn start
    ```
-
-2. Open your browser and visit `http://localhost:3000`
 
 3. The app should automatically open in your default browser
 
-## Project Structure
-
-```
-pyka-website/
 ├── public/
 │   └── index.html          # HTML template
 ├── src/
