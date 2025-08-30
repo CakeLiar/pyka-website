@@ -1,0 +1,579 @@
+// main.js
+// All logic from index.html centralized here
+
+// Tweet data
+const fastCards = [
+    {
+        id: 1,
+        username: "Sarah Chen",
+        handle: "@sarahc_dev",
+        time: "2h",
+        content:
+            "Just discovered this amazing new technology stack. The performance gains are incredible! #webdev #tech",
+        replies: 12,
+        retweets: 8,
+        likes: 24,
+    },
+    {
+        id: 2,
+        username: "Tech Guru",
+        handle: "@techguru2023",
+        time: "4h",
+        content:
+            "Hot take: The best code is the code you don't have to write. Sometimes simplicity wins over complexity.",
+        replies: 5,
+        retweets: 15,
+        likes: 42,
+    },
+    {
+        id: 3,
+        username: "DevLife Daily",
+        handle: "@devlifedaily",
+        time: "6h",
+        content:
+            "Coffee consumption directly correlates with code quality. Scientific fact. ☕️ #developerlife",
+        replies: 23,
+        retweets: 67,
+        likes: 156,
+    },
+    {
+        id: 4,
+        username: "Retro Coder",
+        handle: "@retro_codes",
+        time: "8h",
+        content:
+            "Remember when we used to program on green-screen terminals? Those were simpler times... #nostalgia",
+        replies: 8,
+        retweets: 12,
+        likes: 35,
+    },
+    {
+        id: 5,
+        username: "Pixel Artist",
+        handle: "@pixelartist_",
+        time: "10h",
+        content:
+            "Spent all day working on 8-bit sprites. There's something magical about pixel-perfect art. 🎮",
+        replies: 7,
+        retweets: 18,
+        likes: 89,
+    },
+];
+
+const slowCards = [
+    {
+        id: 1,
+        username: "Alex Thompson",
+        handle: "@alexthinks",
+        time: "1d",
+        content:
+            "Taking time to really think about architecture decisions. Rushed code is technical debt waiting to happen.",
+        replies: 15,
+        retweets: 31,
+        likes: 78,
+    },
+    {
+        id: 2,
+        username: "Mindful Developer",
+        handle: "@mindfuldev_",
+        time: "2d",
+        content:
+            "Meditation before coding sessions has improved my focus tremendously. Mindfulness in software development is underrated.",
+        replies: 9,
+        retweets: 24,
+        likes: 112,
+    },
+    {
+        id: 3,
+        username: "Deep Coder",
+        handle: "@deepcoder_js",
+        time: "3d",
+        content:
+            "Spent the entire day on one function. But now it's perfect, readable, and will save hours of debugging later.",
+        replies: 18,
+        retweets: 45,
+        likes: 134,
+    },
+    {
+        id: 4,
+        username: "Patient Programmer",
+        handle: "@patient_prog",
+        time: "4d",
+        content:
+            "Good software takes time. Rome wasn't built in a day, and neither should your codebase be.",
+        replies: 22,
+        retweets: 67,
+        likes: 189,
+    },
+    {
+        id: 5,
+        username: "Code Craftsman",
+        handle: "@codecraftsman",
+        time: "5d",
+        content:
+            "Refactoring legacy code is like restoring a vintage car. Slow process, but the end result is beautiful.",
+        replies: 13,
+        retweets: 38,
+        likes: 95,
+    },
+];
+
+// State Management
+let scrollAccumulator = 0;
+const scrollThreshold = 200;
+let spotlightVisible = false;
+
+// Multi-state scroll system
+const scrollStates = [
+    {
+        type: "type",
+        message: "design your own recommendation system...",
+        threshold: 5000,
+    },
+    {
+        type: "delete",
+        message: "design your own recommendation system...",
+        threshold: 8000,
+    },
+    {
+        type: "type",
+        message: "make website look cool and retro",
+        threshold: 12000,
+    },
+    {
+        type: "loading",
+        message: "loading",
+        threshold: 15000,
+    },
+    {
+        type: "delete",
+        message: "make website look cool and retro",
+        threshold: 18000,
+    },
+    {
+        type: "type",
+        message: "remove clutter from my homepage...",
+        threshold: 22000,
+    },
+    {
+        type: "remove_posts",
+        message: "remove clutter from my homepage...",
+        threshold: 26000,
+    },
+    {
+        type: "delete",
+        message: "remove clutter from my homepage...",
+        threshold: 29000,
+    },
+    {
+        type: "type",
+        message: "only show posts from potential clients...",
+        threshold: 32000,
+    },
+    {
+        type: "remove_more_posts",
+        message: "only show posts from potential clients...",
+        threshold: 35000,
+    },
+    {
+        type: "highlight_clients",
+        message: "only show posts from potential clients...",
+        threshold: 38000,
+    },
+];
+let currentStateIndex = 0;
+const maxScrollLimit = 40000;
+let removedPosts = new Set();
+let highlightedClients = false;
+
+function createTweetCard(card) {
+    return `
+        <div class="tweet-card">
+            <div class="tweet-header">
+                <div class="tweet-avatar">${card.username.charAt(0).toUpperCase()}</div>
+                <div class="tweet-user-info">
+                    <span class="tweet-username">${card.username}</span>
+                    <span class="tweet-handle">${card.handle}</span>
+                    <span class="tweet-separator">·</span>
+                    <span class="tweet-time">${card.time}</span>
+                </div>
+            </div>
+            <div class="tweet-content">${card.content}</div>
+            <div class="tweet-actions">
+                <div class="tweet-action reply">
+                    <span class="action-icon">💬</span>
+                    <span class="action-count">${card.replies}</span>
+                </div>
+                <div class="tweet-action retweet">
+                    <span class="action-icon">🔄</span>
+                    <span class="action-count">${card.retweets}</span>
+                </div>
+                <div class="tweet-action like">
+                    <span class="action-icon">❤️</span>
+                    <span class="action-count">${card.likes}</span>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+function populateContainer(containerId, cards) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+
+    let html = "";
+    for (let i = 0; i < 8; i++) {
+        html += cards.map(createTweetCard).join("");
+    }
+    container.innerHTML = html;
+}
+
+function createAutoScroll(containerId, speed) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+
+    let scrollInterval;
+    let scrollPosition = 0;
+
+    function startScrolling() {
+        scrollInterval = setInterval(() => {
+            scrollPosition++;
+            container.scrollTop = scrollPosition;
+
+            if (
+                container.scrollTop + container.clientHeight >=
+                container.scrollHeight - 10
+            ) {
+                scrollPosition = 0;
+                container.scrollTop = 0;
+            }
+        }, speed);
+    }
+
+    setTimeout(startScrolling, 500);
+}
+
+function showSpotlight(progress) {
+    const overlay = document.getElementById("spotlight-overlay");
+    const container = overlay.querySelector(".spotlight-container");
+    const homePage = document.getElementById("home-page");
+    const searchInput = overlay.querySelector(".search-input");
+
+    if (!spotlightVisible && progress > 0) {
+        spotlightVisible = true;
+        overlay.style.display = "flex";
+    }
+
+    // Animate spotlight
+    const opacity = Math.min(progress * 2, 1);
+    const scale = 0.8 + progress * 0.2;
+    const translateY = 30 - progress * 30;
+
+    overlay.style.opacity = opacity;
+    container.style.transform = `scale(${scale}) translateY(${translateY}px)`;
+
+    // Multi-state typing animation
+    let displayText = "";
+    let showCursor = false;
+
+    // Find current state based on scroll
+    for (let i = 0; i < scrollStates.length; i++) {
+        if (scrollAccumulator <= scrollStates[i].threshold) {
+            currentStateIndex = i;
+            break;
+        }
+        if (i === scrollStates.length - 1) {
+            currentStateIndex = i;
+        }
+    }
+
+    const currentState = scrollStates[currentStateIndex];
+    const prevThreshold =
+        currentStateIndex > 0
+            ? scrollStates[currentStateIndex - 1].threshold
+            : 0;
+    const stateProgress = Math.min(
+        (scrollAccumulator - prevThreshold) /
+            (currentState.threshold - prevThreshold),
+        1,
+    );
+
+    if (currentState.type === "type") {
+        const charactersToShow = Math.floor(
+            stateProgress * currentState.message.length,
+        );
+        displayText = currentState.message.substring(
+            0,
+            charactersToShow,
+        );
+        showCursor = charactersToShow < currentState.message.length;
+    } else if (currentState.type === "delete") {
+        const charactersToDelete = Math.floor(
+            stateProgress * currentState.message.length,
+        );
+        displayText = currentState.message.substring(
+            0,
+            currentState.message.length - charactersToDelete,
+        );
+        showCursor =
+            charactersToDelete < currentState.message.length;
+    } else if (currentState.type === "loading") {
+        const dots = Math.floor((Date.now() / 300) % 4);
+        displayText = "loading" + ".".repeat(dots);
+        showCursor = false;
+    } else if (currentState.type === "remove_posts") {
+        displayText = currentState.message;
+        showCursor = false;
+
+        // Remove posts gradually based on progress
+        const totalPosts =
+            document.querySelectorAll(".tweet-card").length;
+        const postsToRemove = Math.floor(
+            stateProgress * Math.min(totalPosts * 0.7, 10),
+        );
+
+        document
+            .querySelectorAll(".tweet-card")
+            .forEach((card, index) => {
+                if (
+                    index < postsToRemove &&
+                    !removedPosts.has(index)
+                ) {
+                    removedPosts.add(index);
+                    removePostWithAnimation(card, index * 100);
+                }
+            });
+    } else if (currentState.type === "remove_more_posts") {
+        displayText = currentState.message;
+        showCursor = false;
+
+        // Remove more posts, leaving only potential clients
+        const remainingPosts = document.querySelectorAll(
+            ".tweet-card:not(.removing)",
+        );
+        const postsToRemove = Math.floor(
+            stateProgress *
+                Math.min(remainingPosts.length * 0.8, 15),
+        );
+
+        Array.from(remainingPosts).forEach((card, index) => {
+            // Skip posts from potential clients (keep business-related posts)
+            const content = card
+                .querySelector(".tweet-content")
+                .textContent.toLowerCase();
+            const isClient =
+                content.includes("business") ||
+                content.includes("startup") ||
+                content.includes("tech") ||
+                content.includes("development") ||
+                content.includes("software");
+
+            if (index < postsToRemove && !isClient) {
+                removePostWithAnimation(card, index * 80);
+            }
+        });
+    } else if (currentState.type === "highlight_clients") {
+        displayText = currentState.message;
+        showCursor = false;
+
+        // Hide spotlight and highlight remaining posts as clients
+        if (!highlightedClients && stateProgress > 0.5) {
+            highlightedClients = true;
+            hideSpotlightForClients();
+            highlightPotentialClients();
+        }
+    }
+
+    // Add blinking cursor when needed
+    if (showCursor && progress > 0.1) {
+        const shouldBlink = Math.floor(Date.now() / 500) % 2;
+        displayText += shouldBlink ? "|" : "";
+    }
+
+    if (searchInput) {
+        searchInput.value = displayText;
+    }
+
+    // Change page appearance based on scroll state
+    if (scrollAccumulator > 15000) {
+        document.body.classList.add("retro-mode");
+    } else {
+        document.body.classList.remove("retro-mode");
+    }
+}
+
+function removePostWithAnimation(card, delay = 0) {
+    setTimeout(() => {
+        // Step 1: Warning flash for dramatic "about to be removed" effect
+        card.classList.add("warning-flash");
+        card.style.borderColor = "rgba(255, 59, 48, 0.8)";
+        card.style.boxShadow = "0 0 30px rgba(255, 59, 48, 0.9)";
+
+        // Step 2: After flash, do the dramatic removal
+        setTimeout(() => {
+            card.classList.remove("warning-flash");
+            card.classList.add("removing");
+
+            // Dramatic snap-out animation for clear "aha" moment
+            card.style.transition =
+                "all 0.25s cubic-bezier(0.68, -0.55, 0.265, 1.55)";
+            card.style.transformOrigin = "center center";
+
+            // Initial dramatic shrink with rotation
+            card.style.transform =
+                "scale(0.1) rotate(5deg) translateY(-30px)";
+            card.style.opacity = "0";
+            card.style.filter = "blur(3px) brightness(0.3)";
+            card.style.boxShadow =
+                "0 0 20px rgba(255, 59, 48, 0.8)";
+
+            // Add instant visual feedback
+            card.style.borderColor = "#ff3b30";
+            card.style.backgroundColor = "rgba(255, 59, 48, 0.1)";
+
+            // Remove from DOM after snappy animation
+            setTimeout(() => {
+                if (card.parentNode) {
+                    card.remove();
+                }
+            }, 250);
+        }, 150); // Warning flash duration
+    }, delay);
+}
+
+function hideSpotlightForClients() {
+    const overlay = document.getElementById("spotlight-overlay");
+    const homePage = document.getElementById("home-page");
+
+    // Smooth fade out of spotlight
+    overlay.style.transition = "opacity 1s ease-out";
+    overlay.style.opacity = "0";
+
+    setTimeout(() => {
+        overlay.style.display = "none";
+    }, 1000);
+}
+
+function highlightPotentialClients() {
+    const remainingPosts = document.querySelectorAll(
+        ".tweet-card:not(.removing)",
+    );
+
+    remainingPosts.forEach((card, index) => {
+        const content = card
+            .querySelector(".tweet-content")
+            .textContent.toLowerCase();
+        const isClient =
+            content.includes("business") ||
+            content.includes("startup") ||
+            content.includes("tech") ||
+            content.includes("development") ||
+            content.includes("software");
+
+        if (isClient) {
+            setTimeout(() => {
+                card.classList.add("potential-client");
+
+                // Add client badge
+                const badge = document.createElement("div");
+                badge.className = "client-badge";
+                badge.textContent = "💼 Potential Client";
+                card.appendChild(badge);
+            }, index * 200);
+        }
+    });
+}
+
+function hideSpotlight() {
+    const overlay = document.getElementById("spotlight-overlay");
+    const container = overlay.querySelector(".spotlight-container");
+    const homePage = document.getElementById("home-page");
+    const searchInput = overlay.querySelector(".search-input");
+
+    if (!spotlightVisible) return; // Prevent multiple calls
+
+    spotlightVisible = false;
+
+    // Hide spotlight
+    overlay.style.opacity = "0";
+    container.style.transform = "scale(0.8) translateY(30px)";
+
+    // Clear input and reset scroll accumulator
+    if (searchInput) {
+        searchInput.value = "";
+    }
+
+    // Reset removed posts when hiding spotlight
+    removedPosts.clear();
+    highlightedClients = false;
+
+    // Restore any removed posts by repopulating containers
+    populateContainer("fast-container", fastCards);
+    populateContainer("slow-container", slowCards);
+
+    // Remove client highlighting
+    document
+        .querySelectorAll(".potential-client")
+        .forEach((card) => {
+            card.classList.remove("potential-client");
+            const badge = card.querySelector(".client-badge");
+            if (badge) badge.remove();
+        });
+
+    setTimeout(() => {
+        if (!spotlightVisible) {
+            // Only hide if still meant to be hidden
+            overlay.style.display = "none";
+            scrollAccumulator = 0; // Reset accumulator after hiding
+        }
+    }, 300);
+}
+
+// Scroll event handler
+document.addEventListener(
+    "wheel",
+    function (e) {
+        const delta = e.deltaY;
+
+        if (delta > 0) {
+            // Scrolling down
+            scrollAccumulator = Math.min(
+                scrollAccumulator + delta,
+                maxScrollLimit,
+            );
+            const progress = Math.min(
+                scrollAccumulator / scrollThreshold,
+                1,
+            );
+            showSpotlight(progress);
+        } else if (delta < 0) {
+            // Scrolling up
+            scrollAccumulator = Math.max(
+                0,
+                scrollAccumulator + delta,
+            );
+            if (scrollAccumulator <= 10) {
+                hideSpotlight();
+            } else {
+                const progress = Math.min(
+                    scrollAccumulator / scrollThreshold,
+                    1,
+                );
+                showSpotlight(progress);
+            }
+        }
+
+        e.preventDefault();
+    },
+    { passive: false },
+);
+
+// Initialize
+document.addEventListener("DOMContentLoaded", function () {
+    populateContainer("fast-container", fastCards);
+    populateContainer("slow-container", slowCards);
+    createAutoScroll("fast-container", 50);
+    createAutoScroll("slow-container", 15);
+
+    console.log("Multi-state scroll system initialized");
+});
