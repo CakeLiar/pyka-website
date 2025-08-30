@@ -202,6 +202,43 @@ function App() {
           className="slow-container"
         />
       </div>
+      {/* Spotlight Overlay (matches static HTML) */}
+      <div id="spotlight-overlay" className="spotlight-overlay">
+        <div className="spotlight-backdrop"></div>
+        <div className="spotlight-container">
+          <div className="spotlight-content">
+            <div className="search-bar">
+              <input type="text" className="search-input" readOnly />
+            </div>
+            <div className="spotlight-results">
+              <div className="result-item">
+                <span className="result-icon">🔍</span>
+                <span className="result-text">Search through feeds</span>
+              </div>
+              <div className="result-item">
+                <span className="result-icon">📱</span>
+                <span className="result-text">Control settings</span>
+              </div>
+              <div className="result-item">
+                <span className="result-icon">🌐</span>
+                <span className="result-text">Network options</span>
+              </div>
+              <div className="result-item">
+                <span className="result-icon">⚡</span>
+                <span className="result-text">Speed controls</span>
+              </div>
+              <div className="result-item">
+                <span className="result-icon">🎨</span>
+                <span className="result-text">Theme settings</span>
+              </div>
+              <div className="result-item">
+                <span className="result-icon">🔒</span>
+                <span className="result-text">Privacy options</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
