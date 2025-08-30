@@ -39,24 +39,30 @@
                     </div>
                     <div class="spotlight-results">
                         <div class="result-item">
+                            <span class="result-icon">🔍</span>
+                            <span class="result-text"
+                                >Search through feeds</span
+                            >
+                        </div>
+                        <div class="result-item">
                             <span class="result-icon">📱</span>
-                            <span class="result-text">filter politics</span>
+                            <span class="result-text">Control settings</span>
                         </div>
                         <div class="result-item">
                             <span class="result-icon">🌐</span>
-                            <span class="result-text"
-                                >see potential clients</span
-                            >
+                            <span class="result-text">Network options</span>
                         </div>
                         <div class="result-item">
                             <span class="result-icon">⚡</span>
-                            <span class="result-text"
-                                >filter hateful content</span
-                            >
+                            <span class="result-text">Speed controls</span>
                         </div>
                         <div class="result-item">
                             <span class="result-icon">🎨</span>
-                            <span class="result-text">remove ads</span>
+                            <span class="result-text">Theme settings</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-icon">🔒</span>
+                            <span class="result-text">Privacy options</span>
                         </div>
                     </div>
                 </div>
@@ -200,7 +206,7 @@
                 },
                 {
                     type: "type",
-                    message: "make website look like it was made in the 90s...",
+                    message: "make website look cool and retro",
                     threshold: 12000,
                 },
                 {
@@ -208,9 +214,46 @@
                     message: "loading",
                     threshold: 15000,
                 },
+                {
+                    type: "delete",
+                    message: "make website look cool and retro",
+                    threshold: 18000,
+                },
+                {
+                    type: "type",
+                    message: "remove clutter from my homepage...",
+                    threshold: 22000,
+                },
+                {
+                    type: "remove_posts",
+                    message: "remove clutter from my homepage...",
+                    threshold: 26000,
+                },
+                {
+                    type: "delete",
+                    message: "remove clutter from my homepage...",
+                    threshold: 29000,
+                },
+                {
+                    type: "type",
+                    message: "only show posts from potential clients...",
+                    threshold: 32000,
+                },
+                {
+                    type: "remove_more_posts",
+                    message: "only show posts from potential clients...",
+                    threshold: 35000,
+                },
+                {
+                    type: "highlight_clients",
+                    message: "only show posts from potential clients...",
+                    threshold: 38000,
+                },
             ];
             let currentStateIndex = 0;
-            const maxScrollLimit = 18000; // Limit scroll to prevent going too far beyond retro mode
+            const maxScrollLimit = 40000;
+            let removedPosts = new Set();
+            let highlightedClients = false;
 
             function createTweetCard(card) {
                 return `
@@ -347,6 +390,67 @@
                     const dots = Math.floor((Date.now() / 300) % 4);
                     displayText = "loading" + ".".repeat(dots);
                     showCursor = false;
+                } else if (currentState.type === "remove_posts") {
+                    displayText = currentState.message;
+                    showCursor = false;
+
+                    // Remove posts gradually based on progress
+                    const totalPosts =
+                        document.querySelectorAll(".tweet-card").length;
+                    const postsToRemove = Math.floor(
+                        stateProgress * Math.min(totalPosts * 0.7, 10),
+                    );
+
+                    document
+                        .querySelectorAll(".tweet-card")
+                        .forEach((card, index) => {
+                            if (
+                                index < postsToRemove &&
+                                !removedPosts.has(index)
+                            ) {
+                                removedPosts.add(index);
+                                removePostWithAnimation(card, index * 100);
+                            }
+                        });
+                } else if (currentState.type === "remove_more_posts") {
+                    displayText = currentState.message;
+                    showCursor = false;
+
+                    // Remove more posts, leaving only potential clients
+                    const remainingPosts = document.querySelectorAll(
+                        ".tweet-card:not(.removing)",
+                    );
+                    const postsToRemove = Math.floor(
+                        stateProgress *
+                            Math.min(remainingPosts.length * 0.8, 15),
+                    );
+
+                    Array.from(remainingPosts).forEach((card, index) => {
+                        // Skip posts from potential clients (keep business-related posts)
+                        const content = card
+                            .querySelector(".tweet-content")
+                            .textContent.toLowerCase();
+                        const isClient =
+                            content.includes("business") ||
+                            content.includes("startup") ||
+                            content.includes("tech") ||
+                            content.includes("development") ||
+                            content.includes("software");
+
+                        if (index < postsToRemove && !isClient) {
+                            removePostWithAnimation(card, index * 80);
+                        }
+                    });
+                } else if (currentState.type === "highlight_clients") {
+                    displayText = currentState.message;
+                    showCursor = false;
+
+                    // Hide spotlight and highlight remaining posts as clients
+                    if (!highlightedClients && stateProgress > 0.5) {
+                        highlightedClients = true;
+                        hideSpotlightForClients();
+                        highlightPotentialClients();
+                    }
                 }
 
                 // Add blinking cursor when needed
@@ -367,6 +471,88 @@
                 }
             }
 
+            function removePostWithAnimation(card, delay = 0) {
+                setTimeout(() => {
+                    // Step 1: Warning flash for dramatic "about to be removed" effect
+                    card.classList.add("warning-flash");
+                    card.style.borderColor = "rgba(255, 59, 48, 0.8)";
+                    card.style.boxShadow = "0 0 30px rgba(255, 59, 48, 0.9)";
+
+                    // Step 2: After flash, do the dramatic removal
+                    setTimeout(() => {
+                        card.classList.remove("warning-flash");
+                        card.classList.add("removing");
+
+                        // Dramatic snap-out animation for clear "aha" moment
+                        card.style.transition =
+                            "all 0.25s cubic-bezier(0.68, -0.55, 0.265, 1.55)";
+                        card.style.transformOrigin = "center center";
+
+                        // Initial dramatic shrink with rotation
+                        card.style.transform =
+                            "scale(0.1) rotate(5deg) translateY(-30px)";
+                        card.style.opacity = "0";
+                        card.style.filter = "blur(3px) brightness(0.3)";
+                        card.style.boxShadow =
+                            "0 0 20px rgba(255, 59, 48, 0.8)";
+
+                        // Add instant visual feedback
+                        card.style.borderColor = "#ff3b30";
+                        card.style.backgroundColor = "rgba(255, 59, 48, 0.1)";
+
+                        // Remove from DOM after snappy animation
+                        setTimeout(() => {
+                            if (card.parentNode) {
+                                card.remove();
+                            }
+                        }, 250);
+                    }, 150); // Warning flash duration
+                }, delay);
+            }
+
+            function hideSpotlightForClients() {
+                const overlay = document.getElementById("spotlight-overlay");
+                const homePage = document.getElementById("home-page");
+
+                // Smooth fade out of spotlight
+                overlay.style.transition = "opacity 1s ease-out";
+                overlay.style.opacity = "0";
+
+                setTimeout(() => {
+                    overlay.style.display = "none";
+                }, 1000);
+            }
+
+            function highlightPotentialClients() {
+                const remainingPosts = document.querySelectorAll(
+                    ".tweet-card:not(.removing)",
+                );
+
+                remainingPosts.forEach((card, index) => {
+                    const content = card
+                        .querySelector(".tweet-content")
+                        .textContent.toLowerCase();
+                    const isClient =
+                        content.includes("business") ||
+                        content.includes("startup") ||
+                        content.includes("tech") ||
+                        content.includes("development") ||
+                        content.includes("software");
+
+                    if (isClient) {
+                        setTimeout(() => {
+                            card.classList.add("potential-client");
+
+                            // Add client badge
+                            const badge = document.createElement("div");
+                            badge.className = "client-badge";
+                            badge.textContent = "💼 Potential Client";
+                            card.appendChild(badge);
+                        }, index * 200);
+                    }
+                });
+            }
+
             function hideSpotlight() {
                 const overlay = document.getElementById("spotlight-overlay");
                 const container = overlay.querySelector(".spotlight-container");
@@ -385,6 +571,23 @@
                 if (searchInput) {
                     searchInput.value = "";
                 }
+
+                // Reset removed posts when hiding spotlight
+                removedPosts.clear();
+                highlightedClients = false;
+
+                // Restore any removed posts by repopulating containers
+                populateContainer("fast-container", fastCards);
+                populateContainer("slow-container", slowCards);
+
+                // Remove client highlighting
+                document
+                    .querySelectorAll(".potential-client")
+                    .forEach((card) => {
+                        card.classList.remove("potential-client");
+                        const badge = card.querySelector(".client-badge");
+                        if (badge) badge.remove();
+                    });
 
                 setTimeout(() => {
                     if (!spotlightVisible) {
@@ -441,7 +644,7 @@
                 createAutoScroll("fast-container", 50);
                 createAutoScroll("slow-container", 15);
 
-                console.log("Two-state scroll system initialized");
+                console.log("Multi-state scroll system initialized");
             });
         </script>
     </body>
