@@ -1,13 +1,14 @@
 :root {
     /* Dark theme color palette */
-    --bg-primary: #15202b;
-    --bg-secondary: #192734;
+    --bg-primary: black;
+    --bg-secondary: #111111;
     --bg-hover: #1e2732;
     --border-color: #38444d;
     --text-primary: #ffffff;
     --text-secondary: #8899a6;
-    --twitter-blue: #1da1f2;
-    --twitter-green: #17bf63;
+    --twitter-blue: blue;
+    --twitter-dark-blue: darkblue;
+    --twitter-green: green;
     --twitter-red: #e0245e;
 }
 
@@ -247,17 +248,17 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.6);
+    background: rgba(0, 0, 0, 0.3);
 }
 
 .spotlight-container {
     position: relative;
     width: 600px;
     max-width: 90vw;
-    background: rgba(26, 32, 44, 0.8);
+    background: rgba(26, 32, 44, 0.6);
     border: 1px solid var(--border-color);
     border-radius: 12px;
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
     overflow: hidden;
     z-index: 1001;
     transform: scale(0.8) translateY(30px);
@@ -358,7 +359,7 @@ body {
     }
 
     .header-subtitle {
-        font-size: 0.8rem;
+        font-size: 1rem;
     }
 }
 
@@ -394,6 +395,7 @@ body {
     --text-primary: #00ff41;
     --text-secondary: #00cc33;
     --border-color: #00ff41;
+    --retro-accent: green;
     background: linear-gradient(135deg, #0a0f1a 0%, #1a0f2a 100%);
     animation: matrixGlow 2s ease-in-out infinite alternate;
 }
@@ -427,40 +429,32 @@ body {
 }
 
 .retro-mode .header-title {
-    font-family: "Courier New", monospace;
-    color: #00ff41;
+    font-family: "Times New Roman", monospace;
+    color: green;
     text-shadow:
-        0 0 10px #00ff41,
-        0 0 20px #00ff41,
-        0 0 40px #00ff41;
+        0 0 10px green;
     font-weight: bold;
 }
 
 .retro-mode .header-subtitle {
-    font-family: "Courier New", monospace;
-    color: #00cc33;
-    text-shadow: 0 0 5px #00cc33;
+    font-family: "Garamond", monospace;
+    color: var(--retro-accent);
 }
 
 .retro-mode .tweet-card {
     background: rgba(0, 255, 65, 0.1);
-    border: 1px solid #00ff41;
-    box-shadow: 0 0 15px rgba(0, 255, 65, 0.3);
+    border: 1px solid var(--retro-accent);
 }
 
 .retro-mode .spotlight-container {
-    border: 2px solid #00ff41;
-    box-shadow:
-        0 0 30px rgba(0, 255, 65, 0.5),
-        inset 0 0 30px rgba(0, 255, 65, 0.1);
+    border: 2px solid var(--retro-accent);
 }
 
 .retro-mode .search-input {
     background: rgba(0, 0, 0, 0.8);
-    color: #00ff41;
-    border: 1px solid #00ff41;
+    color: var(--retro-accent);
+    border: 1px solid var(--retro-accent);
     font-family: "Courier New", monospace;
-    text-shadow: 0 0 5px #00ff41;
 }
 
 /* Dramatic Snap-Out Post Removal Animations */
@@ -547,13 +541,13 @@ body {
 
 /* Potential Client Highlighting */
 .potential-client {
-    border: 2px solid #007aff !important;
+    border: 2px solid var(--twitter-blue) !important;
     background: linear-gradient(
         135deg,
         rgba(0, 122, 255, 0.1),
         rgba(0, 122, 255, 0.05)
     ) !important;
-    box-shadow: 0 0 20px rgba(0, 122, 255, 0.4) !important;
+    box-shadow: 0 0 20px var(--twitter-blue) !important;
     animation: clientGlow 2s ease-in-out infinite alternate;
     position: relative;
     transform: scale(1.02);
@@ -562,12 +556,10 @@ body {
 
 @keyframes clientGlow {
     0% {
-        box-shadow: 0 0 20px rgba(0, 122, 255, 0.4);
-        border-color: #007aff;
+        border-color: var(--twitter-blue);
     }
     100% {
-        box-shadow: 0 0 35px rgba(0, 122, 255, 0.8);
-        border-color: #0056cc;
+        border-color: var(--twitter-blue);
     }
 }
 
@@ -575,14 +567,13 @@ body {
     position: absolute;
     top: -10px;
     right: -10px;
-    background: linear-gradient(135deg, #007aff, #0056cc);
+    background: linear-gradient(135deg, var(--twitter-blue), var(--twitter-dark-blue));
     color: white;
     padding: 4px 12px;
     border-radius: 20px;
     font-size: 12px;
     font-weight: bold;
     font-family: "Courier New", monospace;
-    box-shadow: 0 4px 12px rgba(0, 122, 255, 0.6);
     animation: badgePulse 1.5s ease-in-out infinite alternate;
     z-index: 10;
 }
@@ -590,11 +581,9 @@ body {
 @keyframes badgePulse {
     0% {
         transform: scale(1);
-        box-shadow: 0 4px 12px rgba(0, 122, 255, 0.6);
     }
     100% {
         transform: scale(1.05);
-        box-shadow: 0 6px 18px rgba(0, 122, 255, 0.8);
     }
 }
 
@@ -609,15 +598,13 @@ body {
     0% {
         transform: scale(1) translateY(0);
         border-color: var(--border-color);
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     }
     50% {
         transform: scale(1.05) translateY(-5px);
-        border-color: #007aff;
+        border-color: var(--twitter-blue);
     }
     100% {
         transform: scale(1.02) translateY(0);
-        border-color: #007aff;
-        box-shadow: 0 0 20px rgba(0, 122, 255, 0.4);
+        border-color: var(--twitter-blue);
     }
 }

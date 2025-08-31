@@ -12,7 +12,7 @@ export const scrollStates = [
     { type: "delete", message: "design your own recommendation system...", threshold: 8000 },
     { type: "type", message: "make website look cool and retro", threshold: 12000 },
     { type: "loading", message: "loading", threshold: 15000 },
-    { type: "delete", message: "make website look cool and retro", threshold: 18000 },
+    { type: "delete", message: "make website look cool and retro....", threshold: 18000 },
     { type: "type", message: "remove clutter from my homepage...", threshold: 22000 },
     { type: "remove_posts", message: "remove clutter from my homepage...", threshold: 26000 },
     { type: "delete", message: "remove clutter from my homepage...", threshold: 29000 },

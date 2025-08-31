@@ -137,7 +137,7 @@ const scrollStates = [
     },
     {
         type: "type",
-        message: "make website look cool and retro",
+        message: "make website look cool and retro....",
         threshold: 12000,
     },
     {
@@ -147,7 +147,7 @@ const scrollStates = [
     },
     {
         type: "delete",
-        message: "make website look cool and retro",
+        message: "make website look cool and retro....",
         threshold: 18000,
     },
     {
