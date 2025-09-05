@@ -221,11 +221,11 @@ const scrollStates = [
     {
         type: "waitlist_join",
         message: "Join the waitlist for early access!",
-        threshold: 41000,
+        threshold: 39000,
     },
 ];
 let currentStateIndex = 0;
-const maxScrollLimit = 42000;
+const maxScrollLimit = 40000;
 let removedPosts = new Set();
 let highlightedClients = false;
 
