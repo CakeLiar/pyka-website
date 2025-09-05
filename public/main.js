@@ -1,3 +1,41 @@
+// Waitlist form integration
+function handleWaitlistForm(formId, inputId) {
+    const form = document.getElementById(formId);
+    if (!form) return;
+        form.addEventListener('submit', function(e) {
+            e.preventDefault(); // Prevent page refresh
+            const emailInput = document.getElementById(inputId);
+            const email = emailInput.value.trim();
+            if (!email) return;
+            console.log(`[WAITLIST] Submitting email: ${email}`);
+            fetch('/api/addEmail', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email })
+            })
+            .then(async res => {
+                let data;
+                try {
+                    data = await res.json();
+                } catch (err) {
+                    console.error('[WAITLIST] Error parsing response:', err);
+                    alert('Invalid server response.');
+                    return;
+                }
+                console.log('[WAITLIST] API response:', data);
+                if (data.success) {
+                    emailInput.value = '';
+                    alert('You have been added to the waitlist!');
+                } else {
+                    alert(data.error || 'Failed to join waitlist.');
+                }
+            })
+            .catch((err) => {
+                console.error('[WAITLIST] Network error:', err);
+                alert('Network error. Please try again later.');
+            });
+        });
+}
 // main.js
 // All logic from index.html centralized here
 
@@ -180,9 +218,14 @@ const scrollStates = [
         message: "only show posts from potential clients...",
         threshold: 38000,
     },
+    {
+        type: "waitlist_join",
+        message: "Join the waitlist for early access!",
+        threshold: 41000,
+    },
 ];
 let currentStateIndex = 0;
-const maxScrollLimit = 40000;
+const maxScrollLimit = 42000;
 let removedPosts = new Set();
 let highlightedClients = false;
 
@@ -282,11 +325,11 @@ function showSpotlight(progress) {
             currentStateIndex = i;
             break;
         }
-        if (i === scrollStates.length - 1) {
-            currentStateIndex = i;
-        }
     }
-
+    // If scrollAccumulator exceeds all thresholds, use last state
+    if (scrollAccumulator > scrollStates[scrollStates.length - 1].threshold) {
+        currentStateIndex = scrollStates.length - 1;
+    }
     const currentState = scrollStates[currentStateIndex];
     const prevThreshold =
         currentStateIndex > 0
@@ -298,6 +341,10 @@ function showSpotlight(progress) {
         1,
     );
 
+    // Hide waitlist popup by default
+    document.getElementById("waitlist-popup").style.display = "none";
+    document.getElementById("spotlight-overlay").style.display = "flex";
+
     if (currentState.type === "type") {
         const charactersToShow = Math.floor(
             stateProgress * currentState.message.length,
@@ -307,6 +354,8 @@ function showSpotlight(progress) {
             charactersToShow,
         );
         showCursor = charactersToShow < currentState.message.length;
+        document.getElementById("main-header").classList.add("ugly");
+        document.getElementById("main-header").classList.add("centered");
     } else if (currentState.type === "delete") {
         const charactersToDelete = Math.floor(
             stateProgress * currentState.message.length,
@@ -317,21 +366,24 @@ function showSpotlight(progress) {
         );
         showCursor =
             charactersToDelete < currentState.message.length;
+        document.getElementById("main-header").classList.add("ugly");
+        document.getElementById("main-header").classList.add("centered");
     } else if (currentState.type === "loading") {
         const dots = Math.floor((Date.now() / 300) % 4);
         displayText = "loading" + ".".repeat(dots);
         showCursor = false;
+        document.getElementById("main-header").classList.add("centered");
+        document.getElementById("main-header").classList.add("ugly");
     } else if (currentState.type === "remove_posts") {
         displayText = currentState.message;
         showCursor = false;
-
-        // Remove posts gradually based on progress
+        document.getElementById("main-header").classList.remove("centered");
+        document.getElementById("main-header").classList.remove("ugly");
         const totalPosts =
             document.querySelectorAll(".tweet-card").length;
         const postsToRemove = Math.floor(
             stateProgress * Math.min(totalPosts * 0.7, 10),
         );
-
         document
             .querySelectorAll(".tweet-card")
             .forEach((card, index) => {
@@ -346,8 +398,6 @@ function showSpotlight(progress) {
     } else if (currentState.type === "remove_more_posts") {
         displayText = currentState.message;
         showCursor = false;
-
-        // Remove more posts, leaving only potential clients
         const remainingPosts = document.querySelectorAll(
             ".tweet-card:not(.removing)",
         );
@@ -355,9 +405,7 @@ function showSpotlight(progress) {
             stateProgress *
                 Math.min(remainingPosts.length * 0.8, 15),
         );
-
         Array.from(remainingPosts).forEach((card, index) => {
-            // Skip posts from potential clients (keep business-related posts)
             const content = card
                 .querySelector(".tweet-content")
                 .textContent.toLowerCase();
@@ -367,7 +415,6 @@ function showSpotlight(progress) {
                 content.includes("tech") ||
                 content.includes("development") ||
                 content.includes("software");
-
             if (index < postsToRemove && !isClient) {
                 removePostWithAnimation(card, index * 80);
             }
@@ -375,13 +422,16 @@ function showSpotlight(progress) {
     } else if (currentState.type === "highlight_clients") {
         displayText = currentState.message;
         showCursor = false;
-
-        // Hide spotlight and highlight remaining posts as clients
         if (!highlightedClients && stateProgress > 0.5) {
             highlightedClients = true;
             hideSpotlightForClients();
             highlightPotentialClients();
         }
+    } else if (currentState.type === "waitlist_join") {
+        displayText = currentState.message;
+        showCursor = false;
+        document.getElementById("waitlist-popup").style.display = "flex";
+        document.getElementById("spotlight-overlay").style.display = "none";
     }
 
     // Add blinking cursor when needed
@@ -574,6 +624,7 @@ document.addEventListener("DOMContentLoaded", function () {
     populateContainer("slow-container", slowCards);
     createAutoScroll("fast-container", 50);
     createAutoScroll("slow-container", 15);
-
+    handleWaitlistForm('waitlist-form', 'waitlist-email');
+    handleWaitlistForm('waitlist-popup-form', 'waitlist-popup-email');
     console.log("Multi-state scroll system initialized");
 });

@@ -1,3 +1,80 @@
+/* Waitlist Popup Styles */
+.waitlist-popup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.waitlist-backdrop {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0,0,0,0.7);
+    z-index: 1;
+}
+
+.waitlist-container {
+    position: relative;
+    z-index: 2;
+    background: var(--bg-secondary);
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    padding: 2rem 2.5rem;
+    min-width: 340px;
+    max-width: 90vw;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.waitlist-title {
+    color: var(--text-primary);
+    font-size: 1.5rem;
+    margin-bottom: 1.2rem;
+    text-align: center;
+}
+
+.waitlist-popup-form {
+    display: flex;
+    gap: 0.7rem;
+    width: 100%;
+    justify-content: center;
+}
+
+.waitlist-popup-form input[type="email"] {
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
+    font-size: 1rem;
+    outline: none;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    width: 60%;
+}
+
+.waitlist-popup-form button {
+    padding: 0.5rem 1.2rem;
+    border-radius: 6px;
+    border: none;
+    background: var(--twitter-blue);
+    color: var(--text-primary);
+    font-size: 1rem;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background 0.2s;
+}
+
+.waitlist-popup-form button:hover {
+    background: var(--twitter-dark-blue);
+}
 :root {
     /* Dark theme color palette */
     --bg-primary: black;
@@ -40,8 +117,74 @@ body {
     color: var(--text-primary);
     padding: 1rem;
     border-bottom: 1px solid var(--border-color);
-    text-align: center;
     font-family: "Courier New", monospace;
+}
+
+.header.ugly {
+    background: #ff00cc;
+    color: #fff600;
+    border-bottom: 3px dashed #fff600;
+    font-family: Comic Sans MS, cursive, sans-serif;
+    filter: blur(0.5px) brightness(1.2);
+}
+
+.header.ugly .header-title {
+    font-size: 2.5rem;
+    font-weight: bold;
+    text-shadow: 2px 2px 0 #fff600, 4px 4px 0 #ff00cc;
+    letter-spacing: 5px;
+    transform: rotate(-3deg);
+}
+
+.header.ugly .header-subtitle {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #fff600;
+    opacity: 1;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+}
+
+.header.ugly .waitlist-form input[type="email"] {
+    background: #fff600;
+    color: #ff00cc;
+    border: 2px dashed #ff00cc;
+    font-family: inherit;
+}
+
+.header.ugly .waitlist-form button {
+    background: #ff00cc;
+    color: #fff600;
+    border: 2px dashed #fff600;
+    font-family: inherit;
+    font-weight: bold;
+}
+
+.header-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.header.centered {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 180px;
+}
+
+.header.centered .header-content {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.header.centered .header-left,
+.header.centered .header-right {
+    align-items: center;
+    justify-content: center;
+}
 }
 
 .header-title {
@@ -51,6 +194,45 @@ body {
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
     letter-spacing: 2px;
     text-transform: none;
+}
+
+.header-left {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+}
+
+.waitlist-form {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.waitlist-form input[type="email"] {
+    padding: 0.4rem 0.7rem;
+    border-radius: 4px;
+    border: none;
+    font-size: 1rem;
+    outline: none;
+}
+
+.waitlist-form button {
+    padding: 0.4rem 1rem;
+    border-radius: 4px;
+    border: none;
+    background: var(--twitter-dark-blue);
+    color: var(--text-primary);
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.waitlist-form button:hover {
+    background: var(--twitter-blue);
 }
 
 .header-subtitle {

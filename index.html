@@ -9,9 +9,19 @@
     <body>
         <!-- State 0: Main Twitter Feed (Always visible) -->
         <div id="home-page" class="home-page">
-            <div class="header">
-                <h1 class="header-title">pyka.boo</h1>
-                <p class="header-subtitle">control your internet.</p>
+            <div class="header" id="main-header">
+                <div class="header-content">
+                    <div class="header-left">
+                        <h1 class="header-title">pyka.boo</h1>
+                        <p class="header-subtitle">control your internet.</p>
+                    </div>
+                    <div class="header-right">
+                        <form id="waitlist-form" class="waitlist-form" autocomplete="off" onsubmit="return false;">
+                            <input type="email" id="waitlist-email" name="email" placeholder="personal@email.com" required />
+                            <button type="submit">Join</button>
+                        </form>
+                    </div>
+                </div>
             </div>
 
             <div class="containers-wrapper">
@@ -30,6 +40,19 @@
         </div>
 
         <!-- State 1: Spotlight Overlay (Appears on top) -->
+        <!-- Waitlist Popup (Appears at end state) -->
+        <div id="waitlist-popup" class="waitlist-popup" style="display:none;">
+            <div class="waitlist-backdrop"></div>
+            <div class="waitlist-container">
+                <div class="waitlist-content">
+                    <h2 class="waitlist-title">Join the Waitlist</h2>
+                    <form id="waitlist-popup-form" class="waitlist-popup-form" autocomplete="off" onsubmit="return false;">
+                        <input type="email" id="waitlist-popup-email" name="email" placeholder="Enter your email for early access" required />
+                        <button type="submit">Join</button>
+                    </form>
+                </div>
+            </div>
+        </div>
         <div id="spotlight-overlay" class="spotlight-overlay">
             <div class="spotlight-backdrop"></div>
             <div class="spotlight-container">
